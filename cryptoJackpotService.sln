@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Api", "CryptoJackpotService.Api\CryptoJackpotService.Api.csproj", "{9A9CCDD8-171A-4C12-AB7D-EE16D3B3467A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Data", "CryptoJackpotService.Data\CryptoJackpotService.Data.csproj", "{E360E3CF-DD94-45F3-92AF-E988D5334937}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Core", "CryptoJackpotService.Core\CryptoJackpotService.Core.csproj", "{AEE03C9A-27E9-48FB-B46E-FC73753BF918}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Ioc", "CryptoJackpotService.Ioc\CryptoJackpotService.Ioc.csproj", "{23B44B43-B48F-43E5-BE19-3C924800F495}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Models", "CryptoJackpotService.Models\CryptoJackpotService.Models.csproj", "{B6907F2D-1CFA-4A51-AF37-74CAD4636AC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Utility", "CryptoJackpotService.Utility\CryptoJackpotService.Utility.csproj", "{EBD6B706-4906-4454-897F-5C4F3DEBADAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A9CCDD8-171A-4C12-AB7D-EE16D3B3467A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A9CCDD8-171A-4C12-AB7D-EE16D3B3467A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A9CCDD8-171A-4C12-AB7D-EE16D3B3467A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A9CCDD8-171A-4C12-AB7D-EE16D3B3467A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E360E3CF-DD94-45F3-92AF-E988D5334937}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E360E3CF-DD94-45F3-92AF-E988D5334937}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E360E3CF-DD94-45F3-92AF-E988D5334937}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E360E3CF-DD94-45F3-92AF-E988D5334937}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE03C9A-27E9-48FB-B46E-FC73753BF918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEE03C9A-27E9-48FB-B46E-FC73753BF918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEE03C9A-27E9-48FB-B46E-FC73753BF918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEE03C9A-27E9-48FB-B46E-FC73753BF918}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23B44B43-B48F-43E5-BE19-3C924800F495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23B44B43-B48F-43E5-BE19-3C924800F495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23B44B43-B48F-43E5-BE19-3C924800F495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23B44B43-B48F-43E5-BE19-3C924800F495}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6907F2D-1CFA-4A51-AF37-74CAD4636AC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6907F2D-1CFA-4A51-AF37-74CAD4636AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6907F2D-1CFA-4A51-AF37-74CAD4636AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6907F2D-1CFA-4A51-AF37-74CAD4636AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

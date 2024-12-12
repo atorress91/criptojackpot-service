@@ -1,0 +1,6 @@
+@CryptoJackpotService.Api_HostAddress = http://localhost:5076
+
+GET {{CryptoJackpotService.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
