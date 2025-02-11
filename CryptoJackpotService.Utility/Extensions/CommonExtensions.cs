@@ -3,13 +3,19 @@ using System.Data;
 using System.Data.Common;
 using System.Dynamic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
+using BCrypt.Net;
+using CryptoJackpotService.Models.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CryptoJackpotService.Utility.Extensions;
 
@@ -35,7 +41,7 @@ public static class CommonExtensions
 
     public static string? GetIpAddress(this IPAddress source)
     {
-        var ipStr   = source.ToString();
+        var ipStr = source.ToString();
         var splitIp = ipStr.Split(':');
 
         if (splitIp.Length > 1) return source.ToString();
@@ -45,6 +51,38 @@ public static class CommonExtensions
 
     #endregion
 
+    #region ..JWT token
+
+    public static string GenerateJwtToken(this string userId, IOptions<ApplicationConfiguration> appSettings)
+    {
+        var jwtSettings = appSettings.Value.JwtSettings;
+        var secretKey = jwtSettings!.SecretKey;
+        var issuer = jwtSettings.Issuer;
+        var audience = jwtSettings.Audience;
+        var expirationMinutes = jwtSettings.ExpirationInMinutes;
+
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: issuer,
+            audience: audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    #endregion
 
     public static bool IsValidJson(this string value)
     {
@@ -56,6 +94,7 @@ public static class CommonExtensions
         {
             return false;
         }
+
         return true;
     }
 
@@ -67,11 +106,11 @@ public static class CommonExtensions
 
     public static string ToJsonString(this object source, JsonSerializerOptions jsonSerializerSettings)
         => JsonSerializer.Serialize(source, jsonSerializerSettings);
-    
+
     public static IEnumerable<TResult> ZipThree<T1, T2, T3, TResult>(
-        this IEnumerable<T1>      source,
-        IEnumerable<T2>           second,
-        IEnumerable<T3>           third,
+        this IEnumerable<T1> source,
+        IEnumerable<T2> second,
+        IEnumerable<T3> third,
         Func<T1, T2, T3, TResult> func)
     {
         using var e1 = source.GetEnumerator();
@@ -91,9 +130,9 @@ public static class CommonExtensions
 
     public static string? GetPropertyValue(this object value, string propertyName)
     {
-        var     modelDictionary  = value.ToJsonString().ToJsonObject<IDictionary<string, string>>();
-        var     propertyHasValue = false;
-        string? propertyValue    = null;
+        var modelDictionary = value.ToJsonString().ToJsonObject<IDictionary<string, string>>();
+        var propertyHasValue = false;
+        string? propertyValue = null;
         if (modelDictionary is not null && modelDictionary.ContainsKey(propertyName))
             propertyHasValue = modelDictionary.TryGetValue(propertyName, out propertyValue);
 
@@ -103,7 +142,7 @@ public static class CommonExtensions
     public static bool IsValidEmail(this string text)
     {
         var emailRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,10})+)$");
-        var match      = emailRegex.Match(text);
+        var match = emailRegex.Match(text);
 
         return match.Success;
     }
@@ -112,7 +151,7 @@ public static class CommonExtensions
     {
         DateTime date = DateTime.Now;
 
-        string formatDate  = date.ToString("yyyyMMddHHmm");
+        string formatDate = date.ToString("yyyyMMddHHmm");
         string orderNumber = formatDate + id.ToString();
 
         return orderNumber;
@@ -120,7 +159,7 @@ public static class CommonExtensions
 
     public static DataTable ConvertToDataTable<T>(ICollection<T> collection)
     {
-        DataTable      dataTable  = new DataTable();
+        DataTable dataTable = new DataTable();
         PropertyInfo[] properties = typeof(T).GetProperties();
         foreach (PropertyInfo property in properties)
         {
@@ -142,18 +181,62 @@ public static class CommonExtensions
         return dataTable;
     }
 
+    public static string EncryptPass(this string encrypt)
+    {
+        try
+        {
+            var result = BCrypt.Net.BCrypt.HashPassword(encrypt);
+
+            return result;
+        }
+        catch (HashInformationException e)
+        {
+            Console.WriteLine(e.Message);
+
+            throw;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+
+            throw;
+        }
+    }
+
+    public static bool ValidatePass(string? hash, string password)
+    {
+        try
+        {
+            var result = BCrypt.Net.BCrypt.Verify(password, hash);
+
+            return result;
+        }
+        catch (HashInformationException e)
+        {
+            Console.WriteLine(e.Message);
+
+            throw;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+
+            throw;
+        }
+    }
+
     public static T DecryptObject<T>(string encryptedData)
     {
         string keyEncrypted = "0e4897fd799d9aca629d0036b3a4e524d9d200ab9f7e276933903add694a100f";
-        string iv           = "f74dc6fdc72a2828f74dc6fdc72a2828";
+        string iv = "f74dc6fdc72a2828f74dc6fdc72a2828";
 
         byte[] keyBytes = StringToByteArray(keyEncrypted);
-        byte[] ivBytes  = StringToByteArray(iv);
+        byte[] ivBytes = StringToByteArray(iv);
 
         using Aes aes = Aes.Create();
-        aes.Mode    = CipherMode.CBC;
-        aes.Key     = keyBytes;
-        aes.IV      = ivBytes;
+        aes.Mode = CipherMode.CBC;
+        aes.Key = keyBytes;
+        aes.IV = ivBytes;
         aes.Padding = PaddingMode.PKCS7;
 
         byte[] encryptedBytes = Convert.FromBase64String(encryptedData);
@@ -165,7 +248,7 @@ public static class CommonExtensions
         cryptoStream.FlushFinalBlock();
 
         byte[] decryptedBytes = memoryStream.ToArray();
-        string decryptedData  = Encoding.UTF8.GetString(decryptedBytes);
+        string decryptedData = Encoding.UTF8.GetString(decryptedBytes);
 
         var objectDeserialize = decryptedData.ToJsonObject<T>();
 
@@ -174,14 +257,14 @@ public static class CommonExtensions
 
     public static byte[] StringToByteArray(String hex)
     {
-        int    numberChars = hex.Length;
-        byte[] bytes       = new byte[numberChars / 2];
+        int numberChars = hex.Length;
+        byte[] bytes = new byte[numberChars / 2];
         for (int i = 0; i < numberChars; i += 2)
             bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
         return bytes;
     }
-    
-   private static DateTime CalculateStartDate(DateTime purchaseDate, TimeZoneInfo timeZone)
+
+    private static DateTime CalculateStartDate(DateTime purchaseDate, TimeZoneInfo timeZone)
     {
         DateTime startDate;
         var purchaseDateInTimeZone = TimeZoneInfo.ConvertTime(purchaseDate, timeZone);
@@ -207,7 +290,7 @@ public static class CommonExtensions
                 startDate = purchaseDateInTimeZone.AddDays(2);
                 break;
             case DayOfWeek.Sunday:
-                if(purchaseDateInTimeZone.Hour >= 17)
+                if (purchaseDateInTimeZone.Hour >= 17)
                 {
                     startDate = purchaseDateInTimeZone.AddDays(8);
                 }
@@ -215,6 +298,7 @@ public static class CommonExtensions
                 {
                     startDate = purchaseDateInTimeZone.AddDays(1);
                 }
+
                 break;
             default:
                 throw new InvalidOperationException("Day of week is not valid");
@@ -227,7 +311,7 @@ public static class CommonExtensions
     {
         var costaRicaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
         var startDate = CalculateStartDate(purchaseDate, costaRicaTimeZone);
-        var endDate = startDate.AddDays(4); 
+        var endDate = startDate.AddDays(4);
         return (startDate, endDate);
     }
 
@@ -238,14 +322,15 @@ public static class CommonExtensions
         var endDate = startDate.AddDays(28);
         return (startDate, endDate);
     }
+
     public static DateTime CalculateNextMonday(DateTime currentDate)
     {
         int daysUntilMonday = ((int)DayOfWeek.Monday - (int)currentDate.DayOfWeek + 7) % 7;
-        if (daysUntilMonday == 0) 
+        if (daysUntilMonday == 0)
             daysUntilMonday = 7;
         return currentDate.AddDays(daysUntilMonday);
     }
-    
+
     public static uint Crc32(string input)
     {
         var table = new uint[256];
@@ -277,7 +362,7 @@ public static class CommonExtensions
 
         return ~crc;
     }
-    
+
     #region ..Assigned..
 
     private static bool Assigned(this string? source)
@@ -326,7 +411,7 @@ public static class CommonExtensions
         => source is { Count: > 0 };
 
     private static bool Assigned<T, TU>(this KeyValuePair<T, TU> pair)
-        => !pair.Equals(new KeyValuePair<T, TU>()) && pair.Assigned();
+        => pair.Key != null && pair.Value != null;
 
     private static bool AssignedKeyValuePair(object source)
     {
@@ -336,7 +421,7 @@ public static class CommonExtensions
             KeyValuePair<object, string> pair => pair.Assigned(),
             KeyValuePair<string, object> pair => pair.Assigned(),
             KeyValuePair<string, string> pair => pair.Assigned(),
-            _                                 => false
+            _ => false
         };
     }
 
@@ -401,7 +486,8 @@ public static class CommonExtensions
         => source is null || source.Count == 0;
 
     private static bool NotAssigned<T, TU>(this KeyValuePair<T, TU> pair)
-        => pair.Equals(new KeyValuePair<T, TU>()) || pair.NotAssigned();
+        => EqualityComparer<T>.Default.Equals(pair.Key, default(T)) &&
+           EqualityComparer<TU>.Default.Equals(pair.Value, default(TU));
 
     private static bool NotAssignedKeyValuePair(object source)
     {
@@ -411,7 +497,7 @@ public static class CommonExtensions
             KeyValuePair<object, string> pair => pair.NotAssigned(),
             KeyValuePair<string, object> pair => pair.NotAssigned(),
             KeyValuePair<string, string> pair => pair.NotAssigned(),
-            _                                 => true
+            _ => true
         };
     }
 

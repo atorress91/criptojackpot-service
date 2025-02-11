@@ -23,11 +23,15 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors();
 
+app.UseMiddleware<JwtMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseAuthorization();
+
 app.MapHealthChecks("/health");
 app.MapControllers();
 

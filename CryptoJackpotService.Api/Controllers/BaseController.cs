@@ -6,23 +6,23 @@ namespace CryptoJackpotService.Api.Controllers;
 
 public class BaseController : ControllerBase
 {
-    protected static ServicesResponse Success(object data)
-        => new()
+    protected IActionResult Success(object data)
+        => Ok(new ServicesResponse
         {
             Success = true,
-            Code    = (int)HttpStatusCode.OK,
-            Data    = data
-        };
+            Code = (int)HttpStatusCode.OK,
+            Data = data
+        });
 
-    protected static ServicesResponse Fail(string message)
-        => new()
+    protected IActionResult Fail(string message, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
+        => StatusCode((int)statusCode, new ServicesResponse
         {
             Success = false,
-            Code    = (int)HttpStatusCode.BadRequest,
+            Code = (int)statusCode,
             Message = message
-        };
+        });
     
-    protected static ServicesResponse SuccessPaginated<T>(
+    protected IActionResult SuccessPaginated<T>(
         IEnumerable<T> items,
         int totalItems,
         int pageNumber,
@@ -39,6 +39,11 @@ public class BaseController : ControllerBase
             TotalPages = totalPages
         };
 
-        return Success(paginatedResponse);
+        return Ok(new ServicesResponse
+        {
+            Success = true,
+            Code = (int)HttpStatusCode.OK,
+            Data = paginatedResponse
+        });
     }
 }

@@ -18,6 +18,6 @@ public class Country : BaseEntity
     public string? Subregion { get; set; }
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
-    
-    public ICollection<User> Users { get; set; } = new List<User>();
+
+    public ICollection<User> Users { get; set; } = null!;
 }

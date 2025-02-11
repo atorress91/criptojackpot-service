@@ -1,11 +1,20 @@
 ﻿using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
 using CryptoJackpotService.Core.Mapper;
+using CryptoJackpotService.Core.Services;
+using CryptoJackpotService.Core.Services.IServices;
+using CryptoJackpotService.Core.Validators;
 using CryptoJackpotService.Data.Database;
+using CryptoJackpotService.Data.Repositories;
+using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Configuration;
+using CryptoJackpotService.Models.Request;
+using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -15,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using Npgsql;
@@ -31,15 +41,40 @@ public static class IocExtensionApp
         InjectDatabases(services);
         InjectLogging(services);
         InjectControllersAndDocumentation(services);
-        InjectRepositories(services);
         InjectServices(services);
+        InjectValidators(services);
+        InjectRepositories(services);
         InjectPackages(services);
         InjectRegisterServiceProvider(services);
         InjectSingletonAndFactories(services);
     }
 
     private static void InjectAuthentication(IServiceCollection services)
-        => services.AddAuthentication().AddJwtBearer();
+    {
+        var serviceProvider = services.BuildServiceProvider();
+        var configuration = serviceProvider.GetRequiredService<IOptions<ApplicationConfiguration>>().Value;
+
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                if (configuration.JwtSettings != null)
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = configuration.JwtSettings.Issuer,
+                        ValidAudience = configuration.JwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(configuration.JwtSettings.SecretKey))
+                    };
+            });
+    }
 
     private static void InjectConfiguration(IServiceCollection services)
     {
@@ -132,10 +167,21 @@ public static class IocExtensionApp
 
     private static void InjectRepositories(IServiceCollection services)
     {
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
     }
 
     private static void InjectServices(IServiceCollection services)
     {
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICountryService, CountryService>();
+    }
+
+    private static void InjectValidators(IServiceCollection services)
+    {
+        services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+        services.AddTransient<IValidator<AuthenticateRequest>, AuthenticatedRequestValidator>();
     }
 
     private static void InjectPackages(IServiceCollection services)
