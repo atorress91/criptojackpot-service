@@ -18,6 +18,8 @@ public class User : BaseEntity
     public string? GoogleAccessToken { get; set; }
     public string? GoogleRefreshToken { get; set; }
     
+    public string? SecurityCode { get; set; }
+    
     public long RoleId { get; set; }
     public Role Role { get; set; } = null!;
     public Country Country { get; set; } = null!;

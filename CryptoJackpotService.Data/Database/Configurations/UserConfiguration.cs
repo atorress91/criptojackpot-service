@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CryptoJackpotService.Data.Database.Configurations;
 
-public class UserConfiguration: IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
@@ -22,11 +22,13 @@ public class UserConfiguration: IEntityTypeConfiguration<User>
         builder.Property(e => e.ImagePath).HasColumnType("text").HasMaxLength(200);
         builder.Property(e => e.GoogleAccessToken).HasColumnType("text").HasMaxLength(500);
         builder.Property(e => e.GoogleRefreshToken).HasColumnType("text").HasMaxLength(500);
+        builder.Property(e => e.SecurityCode).HasColumnType("text").HasMaxLength(50);
         builder.Property(e => e.CreatedAt).IsRequired();
         builder.Property(e => e.UpdatedAt).IsRequired();
 
         builder.HasIndex(e => e.Email).IsUnique();
         builder.HasIndex(e => e.Phone).IsUnique();
+        builder.HasIndex(e => e.SecurityCode).IsUnique();
         builder.HasIndex(e => e.Identification).IsUnique();
 
         builder.HasOne(e => e.Role).WithMany(r => r.Users).HasForeignKey(e => e.RoleId)

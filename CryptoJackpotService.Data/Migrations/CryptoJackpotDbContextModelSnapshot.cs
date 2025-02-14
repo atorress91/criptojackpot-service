@@ -953,6 +953,11 @@ namespace CryptoJackpotService.Data.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("role_id");
 
+                    b.Property<string>("SecurityCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("text")
+                        .HasColumnName("security_code");
+
                     b.Property<string>("StatePlace")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -987,6 +992,10 @@ namespace CryptoJackpotService.Data.Migrations
 
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_users_role_id");
+
+                    b.HasIndex("SecurityCode")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_security_code");
 
                     b.ToTable("users", (string)null);
                 });

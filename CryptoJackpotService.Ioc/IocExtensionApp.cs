@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
 using CryptoJackpotService.Core.Mapper;
+using CryptoJackpotService.Core.Providers;
+using CryptoJackpotService.Core.Providers.IProviders;
 using CryptoJackpotService.Core.Services;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Core.Validators;
@@ -176,6 +178,9 @@ public static class IocExtensionApp
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICountryService, CountryService>();
+        services.AddScoped<IBrevoService, BrevoService>();
+
+        services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
     }
 
     private static void InjectValidators(IServiceCollection services)
