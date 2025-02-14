@@ -2,7 +2,7 @@
 
 public class ApplicationConfiguration
 {
-    public ConnectionStrings? ConnectionStrings { get; set; }
-    public JwtConfig? JwtSettings { get; set; }
-    public BrevoConfiguration? BrevoConfiguration { get; set; }
+    public ConnectionStrings? ConnectionStrings { get; init; }
+    public JwtConfig? JwtSettings { get; init; }
+    public BrevoConfiguration? BrevoConfiguration { get; init; }
 }
