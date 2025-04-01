@@ -1,5 +1,27 @@
+# Build artifacts
 bin/
 obj/
-/packages/
+
+# Package folders (legacy)
+packages/
+
+# IDEs
+.vscode/
+.vs/
 riderModule.iml
-/_ReSharper.Caches/
+_ReSharper.Caches/
+
+# User-specific files
+*.suo
+*.user
+
+# DB / cache files
+*.db
+*.db-shm
+*.db-wal
+
+# Visual Studio project metadata
+*.vsidx
+*.v9.bin
+*.v9.suo
+
