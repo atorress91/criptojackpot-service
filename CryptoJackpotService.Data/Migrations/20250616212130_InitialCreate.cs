@@ -240,6 +240,7 @@ namespace CryptoJackpotService.Data.Migrations
                     image_path = table.Column<string>(type: "text", maxLength: 200, nullable: true),
                     google_access_token = table.Column<string>(type: "text", maxLength: 500, nullable: true),
                     google_refresh_token = table.Column<string>(type: "text", maxLength: 500, nullable: true),
+                    security_code = table.Column<string>(type: "text", maxLength: 50, nullable: true),
                     role_id = table.Column<long>(type: "bigint", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -613,6 +614,12 @@ namespace CryptoJackpotService.Data.Migrations
                 name: "ix_users_role_id",
                 table: "users",
                 column: "role_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_security_code",
+                table: "users",
+                column: "security_code",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_winners_lottery_id",
