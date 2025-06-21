@@ -1,6 +1,5 @@
 ﻿namespace CryptoJackpotService.Models.Resources;
 
-
     public static class ValidationMessages
     {
         public const string Required = "Required";
