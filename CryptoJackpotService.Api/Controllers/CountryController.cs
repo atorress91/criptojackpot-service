@@ -1,6 +1,5 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoJackpotService.Api.Controllers;
