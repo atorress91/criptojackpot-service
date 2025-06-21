@@ -5,8 +5,7 @@ using CryptoJackpotService.Ioc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agregar servicios de localización
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddLocalization();
 
 // Configurar culturas soportadas
 var supportedCultures = new[] { "en", "es" };

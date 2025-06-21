@@ -1,23 +1,25 @@
 ﻿using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Resources;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace CryptoJackpotService.Core.Validators;
 
-public class AuthenticatedRequestValidator : AbstractValidator<AuthenticateRequest>
+public class AuthenticatedRequestValidator : LocalizedValidator<AuthenticateRequest>
 {
-    public AuthenticatedRequestValidator()
+    public AuthenticatedRequestValidator(IStringLocalizer<SharedResource> localizer) : base(localizer)
     {
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required")
-            .EmailAddress().WithMessage("Invalid email format");
+            .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
+            .EmailAddress().WithMessage(Localizer[ValidationMessages.InvalidEmail]);
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
-            .MaximumLength(16).WithMessage("Password must be no longer than 16 characters.")
-            .Matches("[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches("[a-z]").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches("[0-9]").WithMessage("Password must contain at least one number.")
-            .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character.");
+            .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
+            .MinimumLength(8).WithMessage(x => Localizer[ValidationMessages.MinLength, 8])
+            .MaximumLength(16).WithMessage(x => Localizer[ValidationMessages.MaxLength, 16])
+            .Matches("[A-Z]").WithMessage(Localizer[ValidationMessages.PasswordUppercase])
+            .Matches("[a-z]").WithMessage(Localizer[ValidationMessages.PasswordLowercase])
+            .Matches("[0-9]").WithMessage(Localizer[ValidationMessages.PasswordNumber])
+            .Matches("[^a-zA-Z0-9]").WithMessage(Localizer[ValidationMessages.PasswordSpecialChar]);
     }
 }
