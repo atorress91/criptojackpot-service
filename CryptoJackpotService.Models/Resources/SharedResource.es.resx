@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Mensajes de Validación -->
+  <data name="Required" xml:space="preserve">
+    <value>Este campo es requerido</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Formato de correo electrónico inválido</value>
+  </data>
+  <data name="MinLength" xml:space="preserve">
+    <value>Debe tener al menos {0} caracteres</value>
+  </data>
+  <data name="MaxLength" xml:space="preserve">
+    <value>No debe exceder los {0} caracteres</value>
+  </data>
+  <data name="PasswordUppercase" xml:space="preserve">
+    <value>La contraseña debe contener al menos una letra mayúscula</value>
+  </data>
+  <data name="PasswordLowercase" xml:space="preserve">
+    <value>La contraseña debe contener al menos una letra minúscula</value>
+  </data>
+  <data name="PasswordNumber" xml:space="preserve">
+    <value>La contraseña debe contener al menos un número</value>
+  </data>
+  <data name="PasswordSpecialChar" xml:space="preserve">
+    <value>La contraseña debe contener al menos un carácter especial</value>
+  </data>
+  
+  <!-- Mensajes de Autenticación -->
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Usuario o contraseña inválidos</value>
+  </data>
+  <data name="UserNotCreated" xml:space="preserve">
+    <value>El usuario no fue creado</value>
+  </data>
+  <data name="EmailAlreadyExists" xml:space="preserve">
+    <value>El correo electrónico ya existe</value>
+  </data>
+  <data name="InvalidRequest" xml:space="preserve">
+    <value>Solicitud inválida</value>
+  </data>
+  
+  <!-- Mensajes Generales -->
+  <data name="Success" xml:space="preserve">
+    <value>Operación completada exitosamente</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Ocurrió un error</value>
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Recurso no encontrado</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>Acceso no autorizado</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>Acceso prohibido</value>
+  </data>
+</root>

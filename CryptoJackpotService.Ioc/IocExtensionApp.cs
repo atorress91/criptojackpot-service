@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
+using CryptoJackpotService.Core.Filters;
 using CryptoJackpotService.Core.Mapper;
 using CryptoJackpotService.Core.Providers;
 using CryptoJackpotService.Core.Providers.IProviders;
@@ -24,6 +25,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -142,6 +144,13 @@ public static class IocExtensionApp
             options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(["text/plain"]);
         });
 
+        services.AddControllers(options => { options.Filters.Add<LocalizedValidationFilter>(); })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver();
+            });
+
         services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -181,6 +190,7 @@ public static class IocExtensionApp
         services.AddScoped<IBrevoService, BrevoService>();
 
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
+        services.AddScoped(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
     }
 
     private static void InjectValidators(IServiceCollection services)
