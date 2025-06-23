@@ -12,6 +12,7 @@ namespace CryptoJackpotService.Api.Controllers;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class UserController(IUserService userService) : BaseController
 {
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {

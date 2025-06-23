@@ -14,4 +14,5 @@
         public const string UserNotCreated = "UserNotCreated";
         public const string EmailAlreadyExists = "EmailAlreadyExists";
         public const string InvalidRequest = "InvalidRequest";
+        public const string UserNotVerified = "UserNotVerified";
     }

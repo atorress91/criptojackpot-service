@@ -116,4 +116,8 @@
   <data name="Forbidden" xml:space="preserve">
     <value>Access forbidden</value>
   </data>
+  <data name="UserNotVerified" xml:space="preserve">
+    <value>The account has not been verified.
+</value>
+  </data>
 </root>

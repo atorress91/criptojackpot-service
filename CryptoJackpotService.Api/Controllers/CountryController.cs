@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoJackpotService.Api.Controllers;
@@ -9,6 +10,7 @@ namespace CryptoJackpotService.Api.Controllers;
 [Route("api/v{version:apiVersion}/[controller]")]
 public class CountryController(ICountryService countryService) : BaseController
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetCountries()
     {

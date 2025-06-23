@@ -60,7 +60,7 @@ public class UserService : BaseService, IUserService
             };
 
             var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
-            if (!emailResult.IsSuccess)
+            if (!emailResult.Success)
             {
                 _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Error);
             }

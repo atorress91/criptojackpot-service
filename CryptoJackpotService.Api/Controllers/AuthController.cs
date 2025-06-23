@@ -2,6 +2,7 @@
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoJackpotService.Api.Controllers;
@@ -18,12 +19,12 @@ public class AuthController : BaseController
         _authService = authService;
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Authenticate([FromBody] AuthenticateRequest request)
     {
         var result = await _authService.AuthenticateAsync(request);
-        return result is null
-            ? Fail(ValidationMessages.InvalidCredentials)
-            : Success(result);
+    
+        return result.Success ? Ok(result) : StatusCode((int)result.StatusCode, result);
     }
 }

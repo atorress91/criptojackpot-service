@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net;
+using System.Reflection;
 using System.Text;
 using CryptoJackpotService.Core.Providers.IProviders;
 using CryptoJackpotService.Models.Responses;
@@ -15,7 +16,7 @@ public class EmailTemplateProvider : IEmailTemplateProvider
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<Result<string>> GetTemplateAsync(string templateName)
+    public async Task<ResultResponse<string>> GetTemplateAsync(string templateName)
     {
         try
         {
@@ -25,13 +26,13 @@ public class EmailTemplateProvider : IEmailTemplateProvider
             var template = await File.ReadAllTextAsync(pathFile, Encoding.UTF8);
 
             return string.IsNullOrEmpty(template)
-                ? Result<string>.Failure("Template is empty")
-                : Result<string>.Success(template);
+                ? ResultResponse<string>.Failure("Template is empty", HttpStatusCode.InternalServerError)
+                : ResultResponse<string>.Ok(template);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load template: {TemplateName}", templateName);
-            return Result<string>.Failure($"Failed to load template: {ex.Message}");
+            return ResultResponse<string>.Failure($"Failed to load template: {ex.Message}",HttpStatusCode.InternalServerError);
         }
     }
 }

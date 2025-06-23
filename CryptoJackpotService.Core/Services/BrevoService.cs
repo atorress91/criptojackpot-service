@@ -1,4 +1,5 @@
-﻿using CryptoJackpotService.Core.Providers.IProviders;
+﻿using System.Net;
+using CryptoJackpotService.Core.Providers.IProviders;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Constants;
@@ -32,12 +33,12 @@ public class BrevoService : IBrevoService
         _emailApi = new TransactionalEmailsApi();
     }
 
-    public async Task<Result<string>> SendEmailConfirmationAsync(Dictionary<string, string> data)
+    public async Task<ResultResponse<string>> SendEmailConfirmationAsync(Dictionary<string, string> data)
     {
         var templateResult = await _templateProvider.GetTemplateAsync(Constants.ConfirmEmailTemplate);
-        if (!templateResult.IsSuccess)
+        if (!templateResult.Success)
         {
-            return Result<string>.Failure(templateResult.Error!);
+            return ResultResponse<string>.Failure(templateResult.Error!,HttpStatusCode.BadRequest);
         }
 
         var url = $"{_appConfig.BrevoConfiguration!.BaseUrl}{Constants.UrlConfirmEmail}/{data["token"]}";
@@ -64,12 +65,12 @@ public class BrevoService : IBrevoService
 
             var result = await _emailApi.SendTransacEmailAsync(email);
             _logger.LogInformation("Email sent successfully: {MessageId}", result.MessageId);
-            return Result<string>.Success(result.MessageId);
+            return ResultResponse<string>.Ok(result.MessageId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send email to {Email}", data["user-email"]);
-            return Result<string>.Failure(ex.Message);
+            return ResultResponse<string>.Failure(ex.Message, HttpStatusCode.InternalServerError);
         }
     }
 }
