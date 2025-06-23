@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Models.Resources;
+﻿namespace CryptoJackpotService.Models.Constants;
 
     public static class ValidationMessages
     {

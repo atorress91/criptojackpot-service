@@ -2,6 +2,7 @@
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
+using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;

@@ -1,4 +1,5 @@
-﻿using CryptoJackpotService.Models.Request;
+﻿using CryptoJackpotService.Models.Constants;
+using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
 using FluentValidation;
 using Microsoft.Extensions.Localization;

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
 using Microsoft.AspNetCore.Mvc.Filters;
