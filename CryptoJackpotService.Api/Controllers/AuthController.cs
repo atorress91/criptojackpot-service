@@ -25,6 +25,6 @@ public class AuthController : BaseController
     {
         var result = await _authService.AuthenticateAsync(request);
     
-        return result.Success ? Ok(result) : StatusCode((int)result.StatusCode, result);
+        return result.Success ? Ok(result) : StatusCode((int)result.Code, result);
     }
 }

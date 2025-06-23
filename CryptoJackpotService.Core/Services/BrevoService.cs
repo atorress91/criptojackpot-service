@@ -38,7 +38,7 @@ public class BrevoService : IBrevoService
         var templateResult = await _templateProvider.GetTemplateAsync(Constants.ConfirmEmailTemplate);
         if (!templateResult.Success)
         {
-            return ResultResponse<string>.Failure(templateResult.Error!,HttpStatusCode.BadRequest);
+            return ResultResponse<string>.Failure(templateResult.Message!,HttpStatusCode.BadRequest);
         }
 
         var url = $"{_appConfig.BrevoConfiguration!.BaseUrl}{Constants.UrlConfirmEmail}/{data["token"]}";
@@ -51,7 +51,7 @@ public class BrevoService : IBrevoService
             ["{2}"] = url
         };
 
-        var body = templateResult.Value!.ReplaceHtml(templateData);
+        var body = templateResult.Data!.ReplaceHtml(templateData);
 
         try
         {

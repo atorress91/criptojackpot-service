@@ -62,7 +62,7 @@ public class UserService : BaseService, IUserService
             var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
             if (!emailResult.Success)
             {
-                _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Error);
+                _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
             }
 
             return _mapper.Map<UserDto>(user);
