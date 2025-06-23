@@ -37,10 +37,8 @@ public class UserService : BaseService, IUserService
     {
         var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
-        {
             throw new InvalidOperationException(_localizer[ValidationMessages.EmailAlreadyExists]);
-        }
-
+        
         var user = _mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
@@ -56,7 +54,7 @@ public class UserService : BaseService, IUserService
                 { "lastName", user.LastName },
                 { "token", user.SecurityCode! },
                 { "user-email", user.Email },
-                { "subject", _localizer["EmailConfirmationSubject"] ?? "Confirm your email" }
+                { "subject", _localizer["EmailConfirmationSubject"]}
             };
 
             var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);

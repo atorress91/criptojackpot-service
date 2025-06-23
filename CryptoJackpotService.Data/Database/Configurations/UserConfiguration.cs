@@ -35,6 +35,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(e => e.Country).WithMany(c => c.Users).HasForeignKey(e => e.CountryId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.Navigation(u=>u.Role).AutoInclude();
 
         builder.HasQueryFilter(e => !e.DeletedAt.HasValue);
     }
