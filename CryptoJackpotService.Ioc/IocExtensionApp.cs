@@ -131,6 +131,10 @@ public static class IocExtensionApp
         services.AddLogging(config =>
         {
             config.ClearProviders();
+            config.AddConsole();
+            config.AddDebug();
+            config.SetMinimumLevel(LogLevel.Debug);
+            
             config.AddNLog($"$nlog.{lowerCaseEnvironment}.config");
         });
     }
