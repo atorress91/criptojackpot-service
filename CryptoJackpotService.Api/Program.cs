@@ -16,7 +16,7 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList()
 };
 
-// Configurar para que use el header Accept-Language
+// Configurar para usar header Accept-Language
 localizationOptions.RequestCultureProviders.Clear();
 localizationOptions.RequestCultureProviders.Add(new AcceptLanguageHeaderRequestCultureProvider());
 
@@ -35,7 +35,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Usar localización ANTES de otros middlewares
+// localización ANTES de otros middlewares
 app.UseRequestLocalization();
 
 if (app.Environment.IsDevelopment())
