@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
@@ -71,7 +72,8 @@ public class UserService : BaseService, IUserService
         catch (Exception ex) when (!(ex is CustomException))
         {
             _logger.LogError(ex, "Failed to create user in database");
-            throw; 
+            throw new CustomException(HttpStatusCode.InternalServerError, 
+                _localizer["UnexpectedError"]);
         }
     }
 
