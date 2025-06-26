@@ -27,4 +27,13 @@ public class UserRepository(CryptoJackpotDbContext context) : BaseRepository(con
 
     public async Task<User?> GetUserAsyncByEmail(string email)
         => await Context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+    public async Task<User> UpdateUserAsync(User user)
+    {
+        var today = DateTime.Now;
+        user.UpdatedAt = today;
+        Context.Users.Update(user);
+        await Context.SaveChangesAsync();
+        return user;
+    }
 }

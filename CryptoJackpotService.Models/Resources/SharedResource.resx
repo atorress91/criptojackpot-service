@@ -119,4 +119,10 @@
   <data name="UserNotVerified" xml:space="preserve">
     <value>The account has not been verified</value>
   </data>
+  <data name="ImageProfileNotUpdated" xml:space="preserve">
+    <value>Profile image was not updated</value>
+  </data>
+  <data name="UserNotExists" xml:space="preserve">
+    <value>The user does not exist</value>
+  </data>
 </root>

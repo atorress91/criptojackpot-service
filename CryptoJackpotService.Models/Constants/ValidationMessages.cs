@@ -15,4 +15,6 @@
         public const string EmailAlreadyExists = "EmailAlreadyExists";
         public const string InvalidRequest = "InvalidRequest";
         public const string UserNotVerified = "UserNotVerified";
+        public const string ImageProfileNotUpdated = "ImageProfileNotUpdated";
+        public const string UserNotExists = "UserNotExists";
     }

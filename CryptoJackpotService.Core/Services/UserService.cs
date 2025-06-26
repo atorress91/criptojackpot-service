@@ -4,9 +4,11 @@ using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO;
+using CryptoJackpotService.Models.Exceptions;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Utility.Extensions;
+using CryptoJackpotService.Utility.Helpers;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -34,12 +36,12 @@ public class UserService : BaseService, IUserService
         _localizer = localizer;
     }
 
-    public async Task<UserDto?> CreateUserAsync(CreateUserRequest request)
+    public async Task<UserDto> CreateUserAsync(CreateUserRequest request)
     {
         var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
-            throw new InvalidOperationException(_localizer[ValidationMessages.EmailAlreadyExists]);
-        
+            throw ExceptionFactory.BadRequest(_localizer[ValidationMessages.EmailAlreadyExists]);
+
         var user = _mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
@@ -55,7 +57,7 @@ public class UserService : BaseService, IUserService
                 { "lastName", user.LastName },
                 { "token", user.SecurityCode! },
                 { "user-email", user.Email },
-                { "subject", _localizer["EmailConfirmationSubject"]}
+                { "subject", _localizer["EmailConfirmationSubject"] }
             };
 
             var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
@@ -66,10 +68,30 @@ public class UserService : BaseService, IUserService
 
             return _mapper.Map<UserDto>(user);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!(ex is CustomException))
         {
-            _logger.LogError(ex, "Failed to create user");
-            return null;
+            _logger.LogError(ex, "Failed to create user in database");
+            throw; 
+        }
+    }
+
+    public async Task<UserDto> UpdateImageProfile(UpdateImageProfileRequest request)
+    {
+        var user = await _userRepository.GetUserAsyncById(request.UserId);
+
+        if (user is null)
+            throw ExceptionFactory.NotFound(_localizer[ValidationMessages.UserNotExists]);
+
+        try
+        {
+            user.ImagePath = request.ImageUrl;
+            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            return _mapper.Map<UserDto>(updatedUser);
+        }
+        catch (Exception ex) when (!(ex is CustomException))
+        {
+            _logger.LogError(ex, "Failed to update user profile image for user {UserId}", request.UserId);
+            throw;
         }
     }
 }

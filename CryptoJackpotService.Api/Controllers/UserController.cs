@@ -1,8 +1,6 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
-using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.Request;
-using CryptoJackpotService.Models.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,15 +9,27 @@ namespace CryptoJackpotService.Api.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class UserController(IUserService userService) : BaseController
+public class UserController : BaseController
 {
+    private readonly IUserService _userService;
+    public UserController(IUserService userService)
+    {
+        _userService = userService;
+    }
+
     [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
-        var result = await userService.CreateUserAsync(request);
-        return result is null
-            ? Fail(ValidationMessages.UserNotCreated)
-            : Success(result);
+        var result = await _userService.CreateUserAsync(request);
+        return Ok(Success(result));
+    }
+
+    [Authorize]
+    [HttpPatch("update-image-profile")]
+    public async Task<IActionResult> UpdateImageProfile([FromBody] UpdateImageProfileRequest request)
+    {
+        var result = await _userService.UpdateImageProfile(request);
+        return Ok(Success(result));
     }
 }
