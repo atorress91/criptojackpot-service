@@ -28,12 +28,19 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
 
     public string GeneratePresignedUploadUrl(UploadRequest uploadRequest)
     {
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+        var extension = Path.GetExtension(uploadRequest.FileName).ToLower();
+    
+        if (!allowedExtensions.Contains(extension))
+            throw new ArgumentException("Invalid file type");
+        
+        var uniqueFileName = $"profile-photos/{Guid.NewGuid()}{extension}";
         uploadRequest.ExpirationMinutes ??= 15;
 
         var request = new GetPreSignedUrlRequest
         {
             BucketName = _settings.DigitalOceanSettings!.BucketName,
-            Key = uploadRequest.FileName,
+            Key = uniqueFileName,
             Verb = HttpVerb.PUT,
             Expires = DateTime.UtcNow.AddMinutes(uploadRequest.ExpirationMinutes.Value),
             ContentType = uploadRequest.ContentType
