@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Runtime.Serialization;
 
 namespace CryptoJackpotService.Models.Exceptions;
 
@@ -15,9 +14,7 @@ public class BaseException : Exception
     public BaseException(string message, Exception innerException) : base(message, innerException) { }
 
     public BaseException(string format, Exception innerException, params object[] args) : base(string.Format(format, args), innerException) { }
-
-    public BaseException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-
+    
     public BaseException(HttpStatusCode statusCode)
     {
         StatusCode = statusCode;
