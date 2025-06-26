@@ -22,7 +22,7 @@ public class UserController : BaseController
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         var result = await _userService.CreateUserAsync(request);
-        return Ok(Success(result));
+        return StatusCode(StatusCodes.Status201Created, Success(result));
     }
 
     [Authorize]
