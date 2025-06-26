@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CryptoJackpotService.Api.Controllers;
 
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class AuthController : BaseController
 {
