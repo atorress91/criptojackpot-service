@@ -1,23 +1,9 @@
-﻿using System.Net;
-using System.Text.Json;
-using CryptoJackpotService.Models.Responses;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace CryptoJackpotService.Models.Exceptions;
 
-public class NotFoundException : CustomException
+public class NotFoundException : BaseException
 {
-    public NotFoundException(string message) : base(HttpStatusCode.NotFound, CreateErrorResponse(message))
-    {
-    }
-
-    private static string CreateErrorResponse(string message)
-    {
-        var response = new ServicesResponse
-        {
-            Success = false,
-            Code = (int)HttpStatusCode.NotFound,
-            Message = message
-        };
-        return JsonSerializer.Serialize(response);
-    }
+    public NotFoundException(string message)
+        : base(StatusCodes.Status404NotFound, message) { }
 }

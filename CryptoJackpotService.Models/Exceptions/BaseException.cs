@@ -1,44 +1,11 @@
-﻿using System.Net;
+﻿namespace CryptoJackpotService.Models.Exceptions;
 
-namespace CryptoJackpotService.Models.Exceptions;
-
-[Serializable]
-public class BaseException : Exception
+public abstract class BaseException : Exception
 {
-    public BaseException() { }
+    public int StatusCode { get; }
 
-    public BaseException(string message) : base(message) { }
-
-    public BaseException(string format, params object[] args) : base(string.Format(format, args)) { }
-
-    public BaseException(string message, Exception innerException) : base(message, innerException) { }
-
-    public BaseException(string format, Exception innerException, params object[] args) : base(string.Format(format, args), innerException) { }
-    
-    public BaseException(HttpStatusCode statusCode)
+    protected BaseException(int statusCode, string message) : base(message)
     {
         StatusCode = statusCode;
     }
-
-    public BaseException(string message, HttpStatusCode statusCode) : base(message)
-    {
-        StatusCode = statusCode;
-    }
-
-    public BaseException(string format, HttpStatusCode statusCode, params object[] args) : base(string.Format(format, args))
-    {
-        StatusCode = statusCode;
-    }
-
-    public BaseException(string message, HttpStatusCode statusCode, Exception innerException) : base(message, innerException)
-    {
-        StatusCode = statusCode;
-    }
-
-    public BaseException(string format, HttpStatusCode statusCode, Exception innerException, params object[] args) : base(string.Format(format, args), innerException)
-    {
-        StatusCode = statusCode;
-    }
-
-    public HttpStatusCode StatusCode { get; set; }
 }

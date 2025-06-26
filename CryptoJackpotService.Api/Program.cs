@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization();
 
-// Configurar culturas soportadas
+// culturas soportadas
 var supportedCultures = new[] { "en", "es" };
 var localizationOptions = new RequestLocalizationOptions
 {
@@ -32,10 +32,10 @@ builder.Services.AddHealthChecks();
 builder.Services.IocAppInjectDependencies();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails();  
 
 var app = builder.Build();
 
-// localización ANTES de otros middlewares
 app.UseRequestLocalization();
 
 if (app.Environment.IsDevelopment())

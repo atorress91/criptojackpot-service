@@ -1,11 +1,9 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO;
-using CryptoJackpotService.Models.Exceptions;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Utility.Extensions;
@@ -47,34 +45,25 @@ public class UserService : BaseService, IUserService
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
         user.Password = request.Password.EncryptPass();
+        
+        user = await _userRepository.CreateUserAsync(user);
 
-        try
+        var emailData = new Dictionary<string, string>
         {
-            user = await _userRepository.CreateUserAsync(user);
+            { "name", user.Name },
+            { "lastName", user.LastName },
+            { "token", user.SecurityCode! },
+            { "user-email", user.Email },
+            { "subject", _localizer["EmailConfirmationSubject"] }
+        };
 
-            var emailData = new Dictionary<string, string>
-            {
-                { "name", user.Name },
-                { "lastName", user.LastName },
-                { "token", user.SecurityCode! },
-                { "user-email", user.Email },
-                { "subject", _localizer["EmailConfirmationSubject"] }
-            };
-
-            var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
-            if (!emailResult.Success)
-            {
-                _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
-            }
-
-            return _mapper.Map<UserDto>(user);
-        }
-        catch (Exception ex) when (!(ex is CustomException))
+        var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
+        if (!emailResult.Success)
         {
-            _logger.LogError(ex, "Failed to create user in database");
-            throw new CustomException(HttpStatusCode.InternalServerError, 
-                _localizer["UnexpectedError"]);
+            _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
         }
+
+        return _mapper.Map<UserDto>(user);
     }
 
     public async Task<UserDto> UpdateImageProfile(UpdateImageProfileRequest request)
@@ -84,16 +73,8 @@ public class UserService : BaseService, IUserService
         if (user is null)
             throw ExceptionFactory.NotFound(_localizer[ValidationMessages.UserNotExists]);
 
-        try
-        {
-            user.ImagePath = request.ImageUrl;
-            var updatedUser = await _userRepository.UpdateUserAsync(user);
-            return _mapper.Map<UserDto>(updatedUser);
-        }
-        catch (Exception ex) when (!(ex is CustomException))
-        {
-            _logger.LogError(ex, "Failed to update user profile image for user {UserId}", request.UserId);
-            throw;
-        }
+        user.ImagePath = request.ImageUrl;
+        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        return _mapper.Map<UserDto>(updatedUser);
     }
 }

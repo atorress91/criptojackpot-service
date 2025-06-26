@@ -1,65 +1,32 @@
-﻿using System.Net;
-using System.Net.Mime;
-using CryptoJackpotService.Models.Exceptions;
-using CryptoJackpotService.Models.Resources;
-using CryptoJackpotService.Models.Responses;
-using CryptoJackpotService.Utility.Extensions;
+﻿using CryptoJackpotService.Models.Exceptions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace CryptoJackpotService.Core.Middlewares;
 
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next)
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        => (_next, _logger) = (next, logger);
+
+    public async Task Invoke(HttpContext ctx)
     {
-        _next = next;
-    }
-
-    public async Task InvokeAsync(HttpContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
         try
         {
-            await _next(context);
+            await _next(ctx);
         }
-        catch (Exception e)
+        catch (BaseException bex)
         {
-            await HandleExceptionAsync(context, e);
+            _logger.LogWarning(bex, "Error de negocio: {Message}", bex.Message);
+            throw;
         }
-    }
-
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
-    {
-        var localizer = context.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-        string exceptionBody;
-
-        context.Response.ContentType = MediaTypeNames.Application.Json;
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-        switch (exception)
+        catch (Exception ex)
         {
-            case CustomException customException:
-                context.Response.StatusCode = (int)customException.StatusCode;
-                exceptionBody = customException.ExceptionBody ?? string.Empty;
-                return context.Response.WriteAsync(exceptionBody);
-
-            default:
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                exceptionBody = localizer["Error"];
-
-                var response = new ServicesResponse
-                {
-                    Success = false,
-                    Code = context.Response.StatusCode,
-                    Message = exceptionBody
-                };
-
-                return context.Response.WriteAsync(response.ToJsonString());
+            _logger.LogError(ex, "Error inesperado");
+            throw;
         }
     }
 }
