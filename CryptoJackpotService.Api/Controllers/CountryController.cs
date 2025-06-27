@@ -9,7 +9,7 @@ namespace CryptoJackpotService.Api.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class CountryController(ICountryService countryService) : BaseController
+public class CountryController(ICountryService countryService) : ControllerBase 
 {
     [AllowAnonymous]
     [HttpGet]

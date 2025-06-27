@@ -10,7 +10,7 @@ namespace CryptoJackpotService.Api.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class AuthController : BaseController
+public class AuthController : ControllerBase 
 {
     private readonly IAuthService _authService;
 

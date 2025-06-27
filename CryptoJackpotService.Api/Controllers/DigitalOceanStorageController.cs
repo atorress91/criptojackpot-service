@@ -10,7 +10,7 @@ namespace CryptoJackpotService.Api.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class DigitalOceanStorageController: BaseController
+public class DigitalOceanStorageController: ControllerBase 
 {
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
 

@@ -10,7 +10,7 @@ namespace CryptoJackpotService.Api.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class UserController : BaseController
+public class UserController : ControllerBase 
 {
     private readonly IUserService _userService;
     public UserController(IUserService userService)
