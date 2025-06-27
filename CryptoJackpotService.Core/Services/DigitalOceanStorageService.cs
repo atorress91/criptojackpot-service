@@ -3,8 +3,11 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
+using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace CryptoJackpotService.Core.Services;
@@ -13,11 +16,12 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly ApplicationConfiguration _settings;
-
-    public DigitalOceanStorageService(IOptions<ApplicationConfiguration> settings)
+    private readonly IStringLocalizer<SharedResource> _localizer;
+    public DigitalOceanStorageService(IOptions<ApplicationConfiguration> settings, IStringLocalizer<SharedResource> localizer)
     {
         _settings = settings.Value;
-
+        _localizer = localizer;
+        
         var config = new AmazonS3Config
         {
             ServiceURL = settings.Value.DigitalOceanSettings!.Endpoint,
@@ -34,7 +38,7 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
         var extension = Path.GetExtension(uploadRequest.FileName).ToLower();
     
         if (!allowedExtensions.Contains(extension))
-            return ResultResponse<string>.Failure("Invalid file type", HttpStatusCode.BadRequest);
+            return ResultResponse<string>.Failure(_localizer[ValidationMessages.InvalidFileType], HttpStatusCode.BadRequest);
         
         var uniqueFileName = $"profile-photos/{Guid.NewGuid()}{extension}";
         uploadRequest.ExpirationMinutes ??= 15;

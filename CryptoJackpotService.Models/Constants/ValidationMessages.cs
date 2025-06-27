@@ -15,4 +15,5 @@
         public const string InvalidRequest = "InvalidRequest";
         public const string UserNotVerified = "UserNotVerified";
         public const string UserNotExists = "UserNotExists";
+        public const string InvalidFileType = "InvalidFileType";
     }

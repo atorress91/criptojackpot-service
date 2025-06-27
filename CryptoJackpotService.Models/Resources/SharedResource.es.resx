@@ -91,7 +91,7 @@
     <value>Usuario o contraseña inválidos</value>
   </data>
   <data name="UserNotCreated" xml:space="preserve">
-    <value>El usuario no fue creado</value>
+    <value>El usuario no se pudo crear</value>
   </data>
   <data name="EmailAlreadyExists" xml:space="preserve">
     <value>El correo electrónico ya existe</value>
@@ -120,9 +120,12 @@
     <value>La cuenta no se ha verificado</value>
   </data>
   <data name="ImageProfileNotUpdated" xml:space="preserve">
-    <value>No se actualizó la imagen de perfil</value>
+    <value>Imagen de perfil no se actualizó</value>
   </data>
   <data name="UserNotExists" xml:space="preserve">
     <value>El usuario no existe</value>
+  </data>
+  <data name="InvalidFileType" xml:space="preserve">
+    <value>Formato de archivo no permitido</value>
   </data>
 </root>

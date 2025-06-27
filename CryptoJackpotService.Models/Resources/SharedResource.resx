@@ -125,4 +125,7 @@
   <data name="UserNotExists" xml:space="preserve">
     <value>The user does not exist</value>
   </data>
+  <data name="InvalidFileType" xml:space="preserve">
+    <value>Invalid File Type</value>
+  </data>
 </root>
