@@ -1,9 +1,30 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 
 namespace CryptoJackpotService.Models.Exceptions;
 
-public class InternalServerException : BaseException
+public class CustomException : BaseException
 {
-    public InternalServerException(string message)
-        : base(StatusCodes.Status500InternalServerError, message) { }
+    public CustomException(string message, HttpStatusCode statusCode) 
+        : base(message, statusCode) 
+    {
+    }
+
+    public CustomException(string message, HttpStatusCode statusCode, Exception innerException) 
+        : base(message, statusCode, innerException) 
+    {
+    }
+    
+    public CustomException(string message, HttpStatusCode statusCode, string exceptionBody)
+        : base(message, statusCode)
+    {
+        ExceptionBody = exceptionBody;
+    }
+
+    public CustomException(string message, HttpStatusCode statusCode, string exceptionBody, Exception innerException)
+        : base(message, statusCode, innerException)
+    {
+        ExceptionBody = exceptionBody;
+    }
+
+    public string? ExceptionBody { get; set; }
 }

@@ -1,32 +1,87 @@
-﻿using CryptoJackpotService.Models.Exceptions;
+﻿using System.Net;
+using System.Net.Mime;
+using CryptoJackpotService.Models.Exceptions;
+using CryptoJackpotService.Models.Resources;
+using CryptoJackpotService.Models.Responses;
+using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 
 namespace CryptoJackpotService.Core.Middlewares;
 
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
-        => (_next, _logger) = (next, logger);
-
-    public async Task Invoke(HttpContext ctx)
+    public ExceptionMiddleware(RequestDelegate next)
     {
+        _next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
         try
         {
-            await _next(ctx);
+            await _next(context);
         }
-        catch (BaseException bex)
+        catch (Exception e)
         {
-            _logger.LogWarning(bex, "Error de negocio: {Message}", bex.Message);
-            throw;
+            await HandleExceptionAsync(context, e);
         }
-        catch (Exception ex)
+    }
+
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var localizer = context.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
+        
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+
+        return exception switch
         {
-            _logger.LogError(ex, "Error inesperado");
-            throw;
-        }
+            CustomException customEx when !string.IsNullOrEmpty(customEx.ExceptionBody) => 
+                HandleCustomExceptionWithBody(context, customEx),
+            
+            BaseException baseEx => 
+                HandleBaseException(context, baseEx),
+            
+            _ => HandleGenericException(context, localizer)
+        };
+    }
+
+    private static Task HandleCustomExceptionWithBody(HttpContext context, CustomException customException)
+    {
+        context.Response.StatusCode = (int)customException.StatusCode;
+        return context.Response.WriteAsync(customException.ExceptionBody!);
+    }
+
+    private static Task HandleBaseException(HttpContext context, BaseException baseException)
+    {
+        context.Response.StatusCode = (int)baseException.StatusCode;
+        
+        var response = new ServicesResponse
+        {
+            Success = false,
+            Code = context.Response.StatusCode,
+            Message = baseException.Message
+        };
+
+        return context.Response.WriteAsync(response.ToJsonString());
+    }
+
+    private static Task HandleGenericException(HttpContext context, IStringLocalizer<SharedResource> localizer)
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        
+        var response = new ServicesResponse
+        {
+            Success = false,
+            Code = context.Response.StatusCode,
+            Message = localizer["Error"]
+        };
+
+        return context.Response.WriteAsync(response.ToJsonString());
     }
 }

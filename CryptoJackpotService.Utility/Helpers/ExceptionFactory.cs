@@ -4,14 +4,11 @@ namespace CryptoJackpotService.Utility.Helpers;
 
 public static class ExceptionFactory
 {
-    public static BadRequestException BadRequest(string msg)
-        => new BadRequestException(msg);
+    public static BadRequestException BadRequest(string message)
+        => new BadRequestException(message);
 
-    public static NotFoundException NotFound(string msg)
-        => new NotFoundException(msg);
-
-    public static InternalServerException InternalError(string msg)
-        => new InternalServerException(msg);
+    public static NotFoundException NotFound(string message)
+        => new NotFoundException(message);
 }
 
 

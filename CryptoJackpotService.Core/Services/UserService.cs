@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
@@ -6,8 +7,8 @@ using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
+using CryptoJackpotService.Models.Responses;
 using CryptoJackpotService.Utility.Extensions;
-using CryptoJackpotService.Utility.Helpers;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -35,17 +36,17 @@ public class UserService : BaseService, IUserService
         _localizer = localizer;
     }
 
-    public async Task<UserDto> CreateUserAsync(CreateUserRequest request)
+    public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
     {
         var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
-            throw ExceptionFactory.BadRequest(_localizer[ValidationMessages.EmailAlreadyExists]);
+            return ResultResponse<UserDto>.Failure(_localizer[ValidationMessages.EmailAlreadyExists], HttpStatusCode.BadRequest);
 
         var user = _mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
         user.Password = request.Password.EncryptPass();
-        
+
         user = await _userRepository.CreateUserAsync(user);
 
         var emailData = new Dictionary<string, string>
@@ -63,18 +64,21 @@ public class UserService : BaseService, IUserService
             _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
         }
 
-        return _mapper.Map<UserDto>(user);
+        var userDto = _mapper.Map<UserDto>(user);
+        return ResultResponse<UserDto>.Ok(userDto);
     }
 
-    public async Task<UserDto> UpdateImageProfile(UpdateImageProfileRequest request)
+    public async Task<ResultResponse<UserDto>> UpdateImageProfile(UpdateImageProfileRequest request)
     {
         var user = await _userRepository.GetUserAsyncById(request.UserId);
 
         if (user is null)
-            throw ExceptionFactory.NotFound(_localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(_localizer[ValidationMessages.UserNotExists], HttpStatusCode.NotFound);
 
         user.ImagePath = request.ImageUrl;
         var updatedUser = await _userRepository.UpdateUserAsync(user);
-        return _mapper.Map<UserDto>(updatedUser);
+        var userDto = _mapper.Map<UserDto>(updatedUser);
+
+        return ResultResponse<UserDto>.Ok(userDto);
     }
 }

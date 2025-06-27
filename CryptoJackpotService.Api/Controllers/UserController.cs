@@ -22,7 +22,9 @@ public class UserController : BaseController
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         var result = await _userService.CreateUserAsync(request);
-        return StatusCode(StatusCodes.Status201Created, Success(result));
+        return result.Success 
+            ? Ok(result.Data)
+            : StatusCode((int)result.Code, new { error = result.Message });
     }
 
     [Authorize]
@@ -30,6 +32,8 @@ public class UserController : BaseController
     public async Task<IActionResult> UpdateImageProfile([FromBody] UpdateImageProfileRequest request)
     {
         var result = await _userService.UpdateImageProfile(request);
-        return Ok(Success(result));
+        return result.Success 
+            ? Ok(result.Data)
+            : StatusCode((int)result.Code, new { error = result.Message });
     }
 }

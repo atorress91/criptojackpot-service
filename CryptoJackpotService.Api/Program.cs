@@ -32,7 +32,6 @@ builder.Services.AddHealthChecks();
 builder.Services.IocAppInjectDependencies();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
-builder.Services.AddProblemDetails();  
 
 var app = builder.Build();
 
