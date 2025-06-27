@@ -23,7 +23,7 @@ public class JwtMiddleware
         var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
         var endpoint = context.GetEndpoint();
         
-        if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+        if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
         {
             await _next(context);
             return;
