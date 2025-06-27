@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,8 +23,8 @@ public class DigitalOceanStorageController: BaseController
     [HttpPost("presign")]
     public IActionResult GeneratePresignedUploadUrl([FromBody] UploadRequest uploadRequest)  
     {
-        var url = _digitalOceanStorageService.GeneratePresignedUploadUrl(uploadRequest);  
+        var result = _digitalOceanStorageService.GeneratePresignedUploadUrl(uploadRequest);  
 
-        return Ok(new { url });  
+        return result.ToActionResult();  
     }
 }

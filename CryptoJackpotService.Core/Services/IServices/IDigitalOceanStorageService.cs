@@ -1,8 +1,9 @@
 ﻿using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Responses;
 
 namespace CryptoJackpotService.Core.Services.IServices;
 
 public interface IDigitalOceanStorageService
 {
-    string GeneratePresignedUploadUrl(UploadRequest uploadRequest);
+    ResultResponse<string> GeneratePresignedUploadUrl(UploadRequest uploadRequest);
 }
