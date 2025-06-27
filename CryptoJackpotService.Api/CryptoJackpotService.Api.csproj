@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="13.0.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.6" />
         <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="9.0.6" />
@@ -17,8 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CryptoJackpotService.Core\CryptoJackpotService.Core.csproj" />
-      <ProjectReference Include="..\CryptoJackpotService.Ioc\CryptoJackpotService.Ioc.csproj" />
+        <ProjectReference Include="..\CryptoJackpotService.Core\CryptoJackpotService.Core.csproj" />
+        <ProjectReference Include="..\CryptoJackpotService.Ioc\CryptoJackpotService.Ioc.csproj" />
     </ItemGroup>
 
 </Project>
