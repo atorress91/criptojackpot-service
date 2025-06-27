@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public class AuthController : BaseController
     public async Task<IActionResult> Authenticate([FromBody] AuthenticateRequest request)
     {
         var result = await _authService.AuthenticateAsync(request);
-    
-        return result.Success ? Ok(result) : StatusCode((int)result.Code, result);
+
+        return result.ToActionResult();
     }
 }

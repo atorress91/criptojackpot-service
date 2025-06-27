@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
+using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,6 @@ public class CountryController(ICountryService countryService) : BaseController
     public async Task<IActionResult> GetCountries()
     {
         var countries = await countryService.GetCountriesAsync();
-        return Success(countries);
+        return countries.ToActionResult();
     }
 }
