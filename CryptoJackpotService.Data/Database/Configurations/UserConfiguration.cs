@@ -27,9 +27,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.UpdatedAt).IsRequired();
 
         builder.HasIndex(e => e.Email).IsUnique();
-        builder.HasIndex(e => e.Phone).IsUnique();
         builder.HasIndex(e => e.SecurityCode).IsUnique();
-        builder.HasIndex(e => e.Identification).IsUnique();
 
         builder.HasOne(e => e.Role).WithMany(r => r.Users).HasForeignKey(e => e.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
