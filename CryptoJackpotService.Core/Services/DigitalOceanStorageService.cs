@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
