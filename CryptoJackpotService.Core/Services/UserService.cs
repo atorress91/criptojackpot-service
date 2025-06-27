@@ -1,10 +1,10 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO;
+using CryptoJackpotService.Models.Enums;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
@@ -40,7 +40,7 @@ public class UserService : BaseService, IUserService
     {
         var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
-            return ResultResponse<UserDto>.Failure(_localizer[ValidationMessages.EmailAlreadyExists], HttpStatusCode.BadRequest);
+            return ResultResponse<UserDto>.Failure(ErrorType.Conflict,_localizer[ValidationMessages.EmailAlreadyExists]);
 
         var user = _mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
@@ -73,7 +73,7 @@ public class UserService : BaseService, IUserService
         var user = await _userRepository.GetUserAsyncById(request.UserId);
 
         if (user is null)
-            return ResultResponse<UserDto>.Failure(_localizer[ValidationMessages.UserNotExists], HttpStatusCode.NotFound);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound,_localizer[ValidationMessages.UserNotExists]);
 
         user.ImagePath = request.ImageUrl;
         var updatedUser = await _userRepository.UpdateUserAsync(user);

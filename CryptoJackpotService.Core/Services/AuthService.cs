@@ -1,10 +1,10 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO;
+using CryptoJackpotService.Models.Enums;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
@@ -37,10 +37,10 @@ public class AuthService : BaseService, IAuthService
         var user = await _userRepository.GetUserAsyncByEmail(request.Email);
 
         if (user == null || !CommonExtensions.ValidatePass(user.Password, request.Password))
-            return ResultResponse<UserDto?>.Failure(_localizer[ValidationMessages.InvalidCredentials], HttpStatusCode.Unauthorized);
+            return ResultResponse<UserDto?>.Failure(ErrorType.Unauthorized,_localizer[ValidationMessages.InvalidCredentials]);
 
         if (!user.Status)
-            return ResultResponse<UserDto?>.Failure(_localizer[ValidationMessages.UserNotVerified],HttpStatusCode.Forbidden);
+            return ResultResponse<UserDto?>.Failure(ErrorType.Forbidden,_localizer[ValidationMessages.UserNotVerified]);
 
         var userDto = Mapper.Map<UserDto>(user);
         userDto.Token = user.Id.ToString().GenerateJwtToken(_appSettings);

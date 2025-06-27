@@ -1,7 +1,7 @@
-﻿using System.Net;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using CryptoJackpotService.Core.Providers.IProviders;
+using CryptoJackpotService.Models.Enums;
 using CryptoJackpotService.Models.Responses;
 using Microsoft.Extensions.Logging;
 
@@ -26,13 +26,13 @@ public class EmailTemplateProvider : IEmailTemplateProvider
             var template = await File.ReadAllTextAsync(pathFile, Encoding.UTF8);
 
             return string.IsNullOrEmpty(template)
-                ? ResultResponse<string>.Failure("Template is empty", HttpStatusCode.InternalServerError)
+                ? ResultResponse<string>.Failure(ErrorType.Unexpected,"Template is empty")
                 : ResultResponse<string>.Ok(template);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load template: {TemplateName}", templateName);
-            return ResultResponse<string>.Failure($"Failed to load template: {ex.Message}",HttpStatusCode.InternalServerError);
+            return ResultResponse<string>.Failure(ErrorType.Unexpected,$"Failed to load template: {ex.Message}");
         }
     }
 }

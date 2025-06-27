@@ -1,8 +1,8 @@
-﻿using System.Net;
-using CryptoJackpotService.Core.Providers.IProviders;
+﻿using CryptoJackpotService.Core.Providers.IProviders;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Constants;
+using CryptoJackpotService.Models.Enums;
 using CryptoJackpotService.Models.Responses;
 using CryptoJackpotService.Utility.Extensions;
 using Microsoft.Extensions.Logging;
@@ -38,7 +38,7 @@ public class BrevoService : IBrevoService
         var templateResult = await _templateProvider.GetTemplateAsync(Constants.ConfirmEmailTemplate);
         if (!templateResult.Success)
         {
-            return ResultResponse<string>.Failure(templateResult.Message!,HttpStatusCode.BadRequest);
+            return ResultResponse<string>.Failure(ErrorType.BadRequest,templateResult.Message!);
         }
 
         var url = $"{_appConfig.BrevoConfiguration!.BaseUrl}{Constants.UrlConfirmEmail}/{data["token"]}";
@@ -70,7 +70,7 @@ public class BrevoService : IBrevoService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send email to {Email}", data["user-email"]);
-            return ResultResponse<string>.Failure(ex.Message, HttpStatusCode.InternalServerError);
+            return ResultResponse<string>.Failure(ErrorType.Unexpected,ex.Message);
         }
     }
 }

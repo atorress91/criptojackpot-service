@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using BCrypt.Net;
 using CryptoJackpotService.Models.Configuration;
+using CryptoJackpotService.Models.Enums;
 using CryptoJackpotService.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -367,18 +368,31 @@ public static class CommonExtensions
     
     public static IActionResult ToActionResult<T>(this ResultResponse<T> result)
     {
+        var status = result.ErrorType?.ToStatusCode() ?? HttpStatusCode.OK;
+
         var payload = new
         {
             success = result.Success,
-            data = result.Data,
+            data    = result.Data,
             message = result.Message,
-            code = (int)result.Code
+            code    = (int)status
         };
 
         return result.Success
             ? new OkObjectResult(payload)
-            : new ObjectResult(payload) { StatusCode = (int)result.Code };
+            : new ObjectResult(payload) { StatusCode = (int)status };
     }
+    
+    public static HttpStatusCode ToStatusCode(this ErrorType type) => type switch
+    {
+        ErrorType.Conflict     => HttpStatusCode.Conflict,            // 409
+        ErrorType.Validation   => HttpStatusCode.UnprocessableEntity, // 422
+        ErrorType.NotFound     => HttpStatusCode.NotFound,            // 404
+        ErrorType.Unauthorized => HttpStatusCode.Unauthorized,        // 401
+        ErrorType.BadRequest   => HttpStatusCode.BadRequest,          // 400
+        ErrorType.Forbidden    => HttpStatusCode.Forbidden,           // 403
+        _                      => HttpStatusCode.InternalServerError  // 500
+    };
 
 
     #region ..Assigned..

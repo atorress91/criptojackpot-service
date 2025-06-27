@@ -4,6 +4,7 @@ using Amazon.S3.Model;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Constants;
+using CryptoJackpotService.Models.Enums;
 using CryptoJackpotService.Models.Request;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
@@ -37,7 +38,7 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
         var extension = Path.GetExtension(uploadRequest.FileName).ToLower();
     
         if (!Constants.AllowedExtensions.Contains(extension))
-            return ResultResponse<string>.Failure(_localizer[ValidationMessages.InvalidFileType], HttpStatusCode.BadRequest);
+            return ResultResponse<string>.Failure(ErrorType.BadRequest,_localizer[ValidationMessages.InvalidFileType]);
         
         var uniqueFileName = $"profile-photos/{Guid.NewGuid()}{extension}";
         uploadRequest.ExpirationMinutes ??= 15;
