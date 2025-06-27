@@ -14,6 +14,8 @@ using System.Text.RegularExpressions;
 using System.Web;
 using BCrypt.Net;
 using CryptoJackpotService.Models.Configuration;
+using CryptoJackpotService.Models.Responses;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -362,6 +364,22 @@ public static class CommonExtensions
 
         return ~crc;
     }
+    
+    public static IActionResult ToActionResult<T>(this ResultResponse<T> result)
+    {
+        var payload = new
+        {
+            success = result.Success,
+            data = result.Data,
+            message = result.Message,
+            code = (int)result.Code
+        };
+
+        return result.Success
+            ? new OkObjectResult(payload)
+            : new ObjectResult(payload) { StatusCode = (int)result.Code };
+    }
+
 
     #region ..Assigned..
 
