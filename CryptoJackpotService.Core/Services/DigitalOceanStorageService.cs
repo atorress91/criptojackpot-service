@@ -34,10 +34,9 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
 
     public ResultResponse<string> GeneratePresignedUploadUrl(UploadRequest uploadRequest)
     {
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
         var extension = Path.GetExtension(uploadRequest.FileName).ToLower();
     
-        if (!allowedExtensions.Contains(extension))
+        if (!Constants.AllowedExtensions.Contains(extension))
             return ResultResponse<string>.Failure(_localizer[ValidationMessages.InvalidFileType], HttpStatusCode.BadRequest);
         
         var uniqueFileName = $"profile-photos/{Guid.NewGuid()}{extension}";
