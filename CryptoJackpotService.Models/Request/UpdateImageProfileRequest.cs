@@ -2,6 +2,6 @@
 
 public class UpdateImageProfileRequest
 {
-    public int UserId { get; set; }
+    public long UserId { get; set; }
     public string ImageUrl { get; set; } = null!;
 }

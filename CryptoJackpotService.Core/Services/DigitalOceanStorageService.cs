@@ -55,4 +55,19 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
 
         return ResultResponse<string>.Ok(url);
     }
+
+    public string GetPresignedUrl(string key)
+    {
+        const int expiresIn = 60;
+        
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = _settings.DigitalOceanSettings!.BucketName,
+            Key = key,
+            Verb = HttpVerb.GET,
+            Expires = DateTime.UtcNow.AddMinutes(expiresIn)
+        };
+        
+        return _s3Client.GetPreSignedURL(request);
+    }
 }

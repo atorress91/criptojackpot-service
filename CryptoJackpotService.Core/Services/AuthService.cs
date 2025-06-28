@@ -19,17 +19,20 @@ public class AuthService : BaseService, IAuthService
     private readonly IUserRepository _userRepository;
     private readonly IOptions<ApplicationConfiguration> _appSettings;
     private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly IDigitalOceanStorageService _digitalOceanStorageService;
 
     public AuthService(
         IMapper mapper,
         IUserRepository userRepository,
         IOptions<ApplicationConfiguration> appSettings,
-        IStringLocalizer<SharedResource> localizer)
+        IStringLocalizer<SharedResource> localizer,
+        IDigitalOceanStorageService digitalOceanStorageService)
         : base(mapper)
     {
         _userRepository = userRepository;
         _appSettings = appSettings;
         _localizer = localizer;
+        _digitalOceanStorageService = digitalOceanStorageService;
     }
 
     public async Task<ResultResponse<UserDto?>> AuthenticateAsync(AuthenticateRequest request)
@@ -42,6 +45,11 @@ public class AuthService : BaseService, IAuthService
         if (!user.Status)
             return ResultResponse<UserDto?>.Failure(ErrorType.Forbidden,_localizer[ValidationMessages.UserNotVerified]);
 
+        if (user.ImagePath is not null)
+        { 
+            user.ImagePath =  _digitalOceanStorageService.GetPresignedUrl(user.ImagePath);
+        }
+        
         var userDto = Mapper.Map<UserDto>(user);
         userDto.Token = user.Id.ToString().GenerateJwtToken(_appSettings);
 

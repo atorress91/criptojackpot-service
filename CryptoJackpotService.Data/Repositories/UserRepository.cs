@@ -22,7 +22,7 @@ public class UserRepository(CryptoJackpotDbContext context) : BaseRepository(con
             .FirstAsync(u => u.Id == user.Id);
     }
 
-    public async Task<User?> GetUserAsyncById(int id)
+    public async Task<User?> GetUserAsyncById(long id)
         => await Context.Users.FindAsync(id);
 
     public async Task<User?> GetUserAsyncByEmail(string email)

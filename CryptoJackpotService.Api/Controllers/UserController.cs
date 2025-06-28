@@ -10,9 +10,10 @@ namespace CryptoJackpotService.Api.Controllers;
 [ApiController]
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class UserController : ControllerBase 
+public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+
     public UserController(IUserService userService)
     {
         _userService = userService;
@@ -26,7 +27,7 @@ public class UserController : ControllerBase
         return result.ToActionResult();
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPatch("update-image-profile")]
     public async Task<IActionResult> UpdateImageProfile([FromBody] UpdateImageProfileRequest request)
     {
