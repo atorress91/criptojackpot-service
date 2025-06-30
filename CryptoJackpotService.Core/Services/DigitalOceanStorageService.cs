@@ -41,7 +41,7 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
         
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var randomSuffix = Guid.NewGuid().ToString("N")[..8];
-        var uniqueFileName = $"profile-photos/user-{uploadRequest.UserId}-{timestamp}-{randomSuffix}{extension}";
+        var uniqueFileName = $"profile-photos/{uploadRequest.UserId}/user-{uploadRequest.UserId}-{timestamp}-{randomSuffix}{extension}";
         uploadRequest.ExpirationMinutes ??= 15;
 
         var request = new GetPreSignedUrlRequest
