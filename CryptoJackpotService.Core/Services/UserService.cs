@@ -21,19 +21,21 @@ public class UserService : BaseService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IMapper _mapper;
     private readonly IStringLocalizer<SharedResource> _localizer;
-
+    private readonly IDigitalOceanStorageService _digitalOceanStorageService;
     public UserService(
         IMapper mapper,
         IUserRepository userRepository,
         IBrevoService brevoService,
         ILogger<UserService> logger,
-        IStringLocalizer<SharedResource> localizer) : base(mapper)
+        IStringLocalizer<SharedResource> localizer,
+        IDigitalOceanStorageService digitalOceanStorageService) : base(mapper)
     {
         _mapper = mapper;
         _userRepository = userRepository;
         _brevoService = brevoService;
         _logger = logger;
         _localizer = localizer;
+        _digitalOceanStorageService = digitalOceanStorageService;
     }
 
     public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
@@ -78,6 +80,9 @@ public class UserService : BaseService, IUserService
         user.ImagePath = request.ImageUrl;
         var updatedUser = await _userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
+        
+        if(userDto.ImagePath != null)
+            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
 
         return ResultResponse<UserDto>.Ok(userDto);
     }

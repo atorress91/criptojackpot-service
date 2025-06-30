@@ -39,7 +39,9 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
         if (!Constants.AllowedExtensions.Contains(extension))
             return ResultResponse<string>.Failure(ErrorType.BadRequest,_localizer[ValidationMessages.InvalidFileType]);
         
-        var uniqueFileName = $"profile-photos/{Guid.NewGuid()}{extension}";
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var randomSuffix = Guid.NewGuid().ToString("N")[..8];
+        var uniqueFileName = $"profile-photos/user-{uploadRequest.UserId}-{timestamp}-{randomSuffix}{extension}";
         uploadRequest.ExpirationMinutes ??= 15;
 
         var request = new GetPreSignedUrlRequest
