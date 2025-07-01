@@ -184,6 +184,7 @@ public static class IocExtensionApp
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IUserReferralRepository, UserReferralRepository>();
     }
 
     private static void InjectServices(IServiceCollection services)

@@ -20,6 +20,7 @@ public class CryptoJackpotDbContext(DbContextOptions<CryptoJackpotDbContext> opt
     public DbSet<Invoice> Invoices { get; set; } = null!;
     public DbSet<InvoiceDetail> InvoiceDetails { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
+    public DbSet<UserReferral> UserReferrals { get; set; } = null!;
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSnakeCaseNamingConvention();
 
