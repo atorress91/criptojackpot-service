@@ -16,4 +16,6 @@
         public const string UserNotVerified = "UserNotVerified";
         public const string UserNotExists = "UserNotExists";
         public const string InvalidFileType = "InvalidFileType";
+        public const string InvalidReferralCode = "InvalidReferralCode";
+        public const string AlreadyReferred = "AlreadyReferred";
     }

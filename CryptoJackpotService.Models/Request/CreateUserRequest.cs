@@ -17,4 +17,6 @@ public class CreateUserRequest
     public string? ImagePath { get; set; }
     public string? GoogleAccessToken { get; set; }
     public string? GoogleRefreshToken { get; set; }
+    
+    public string? ReferralCode { get; set; }
 }

@@ -16,8 +16,12 @@ public class MapperProfile : Profile
     {
         CreateMap<User, UserDto>();
         CreateMap<CreateUserRequest, User>();
+        CreateMap<UserReferralRequest, UserReferral>()
+            .ForMember(dest => dest.UsedSecurityCode, 
+                opt => opt.MapFrom(src => src.ReferralCode));
 
         CreateMap<Country, CountryDto>();
         CreateMap<Role, RoleDto>();
+        CreateMap<UserReferral, UserReferralDto>();
     }
 }

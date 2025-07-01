@@ -22,6 +22,7 @@ public class UserService : BaseService, IUserService
     private readonly IMapper _mapper;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
+  
     public UserService(
         IMapper mapper,
         IUserRepository userRepository,
@@ -43,7 +44,18 @@ public class UserService : BaseService, IUserService
         var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
             return ResultResponse<UserDto>.Failure(ErrorType.Conflict,_localizer[ValidationMessages.EmailAlreadyExists]);
-
+        
+        User? referrerUser = null; 
+        if (!string.IsNullOrEmpty(request.ReferralCode))
+        {
+            referrerUser = await _userRepository.GetUserBySecurityCodeAsync(request.ReferralCode);
+            if (referrerUser is null)
+            {
+                return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, 
+                    _localizer[ValidationMessages.InvalidReferralCode]);
+            }
+        }
+        
         var user = _mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
@@ -51,6 +63,11 @@ public class UserService : BaseService, IUserService
 
         user = await _userRepository.CreateUserAsync(user);
 
+        if (referrerUser != null)
+        {
+            //TODO: Llamar al servicio de referidos para que lo cree.
+        }
+        
         var emailData = new Dictionary<string, string>
         {
             { "name", user.Name },

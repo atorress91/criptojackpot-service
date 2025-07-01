@@ -194,6 +194,7 @@ public static class IocExtensionApp
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<IBrevoService, BrevoService>();
         services.AddScoped<IDigitalOceanStorageService, DigitalOceanStorageService>();
+        services.AddScoped<IUserReferralService, UserReferralService>();
 
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
         services.AddScoped(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
