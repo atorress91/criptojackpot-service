@@ -23,4 +23,10 @@ public class User : BaseEntity
     public long RoleId { get; set; }
     public Role Role { get; set; } = null!;
     public Country Country { get; set; } = null!;
+    
+    // Navegación: Usuarios que este usuario ha referido
+    public ICollection<UserReferral> Referrals { get; set; } = new List<UserReferral>();
+    
+    // Navegación: Referido por 
+    public UserReferral? ReferredBy { get; set; }
 }
