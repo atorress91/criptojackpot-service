@@ -48,16 +48,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors();
 
 app.UseAuthentication();
-app.UseAuthorization();
 app.UseMiddleware<JwtMiddleware>();
+app.UseAuthorization();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapHealthChecks("/health");
 app.MapControllers();

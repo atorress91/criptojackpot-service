@@ -27,7 +27,7 @@ public class UserController : ControllerBase
         return result.ToActionResult();
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPatch("update-image-profile")]
     public async Task<IActionResult> UpdateImageProfile([FromBody] UpdateImageProfileRequest request)
     {

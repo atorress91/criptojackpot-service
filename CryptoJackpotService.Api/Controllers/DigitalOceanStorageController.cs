@@ -19,7 +19,7 @@ public class DigitalOceanStorageController: ControllerBase
         _digitalOceanStorageService = digitalOceanStorageService;
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPost("presign")]
     public IActionResult GeneratePresignedUploadUrl([FromBody] UploadRequest uploadRequest)  
     {
