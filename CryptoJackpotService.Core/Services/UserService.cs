@@ -22,14 +22,16 @@ public class UserService : BaseService, IUserService
     private readonly IMapper _mapper;
     private readonly IStringLocalizer<SharedResource> _localizer;
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
-  
+    private readonly IUserReferralService _userReferralService;
+
     public UserService(
         IMapper mapper,
         IUserRepository userRepository,
         IBrevoService brevoService,
         ILogger<UserService> logger,
         IStringLocalizer<SharedResource> localizer,
-        IDigitalOceanStorageService digitalOceanStorageService) : base(mapper)
+        IDigitalOceanStorageService digitalOceanStorageService,
+        IUserReferralService userReferralService) : base(mapper)
     {
         _mapper = mapper;
         _userRepository = userRepository;
@@ -37,25 +39,27 @@ public class UserService : BaseService, IUserService
         _logger = logger;
         _localizer = localizer;
         _digitalOceanStorageService = digitalOceanStorageService;
+        _userReferralService = userReferralService;
     }
 
     public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
     {
         var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
-            return ResultResponse<UserDto>.Failure(ErrorType.Conflict,_localizer[ValidationMessages.EmailAlreadyExists]);
-        
-        User? referrerUser = null; 
+            return ResultResponse<UserDto>.Failure(ErrorType.Conflict,
+                _localizer[ValidationMessages.EmailAlreadyExists]);
+
+        User? referrerUser = null;
         if (!string.IsNullOrEmpty(request.ReferralCode))
         {
             referrerUser = await _userRepository.GetUserBySecurityCodeAsync(request.ReferralCode);
             if (referrerUser is null)
             {
-                return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, 
+                return ResultResponse<UserDto>.Failure(ErrorType.BadRequest,
                     _localizer[ValidationMessages.InvalidReferralCode]);
             }
         }
-        
+
         var user = _mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
@@ -66,8 +70,10 @@ public class UserService : BaseService, IUserService
         if (referrerUser != null)
         {
             //TODO: Llamar al servicio de referidos para que lo cree.
+            await _userReferralService.CreateUserReferralAsync(new UserReferralRequest
+                { ReferredId = user.Id, ReferrerId = referrerUser.Id, ReferralCode = request.ReferralCode });
         }
-        
+
         var emailData = new Dictionary<string, string>
         {
             { "name", user.Name },
@@ -92,13 +98,13 @@ public class UserService : BaseService, IUserService
         var user = await _userRepository.GetUserAsyncById(request.UserId);
 
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound,_localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
 
         user.ImagePath = request.ImageUrl;
         var updatedUser = await _userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
-        
-        if(userDto.ImagePath != null)
+
+        if (userDto.ImagePath != null)
             userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
 
         return ResultResponse<UserDto>.Ok(userDto);
