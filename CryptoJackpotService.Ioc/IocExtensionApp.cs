@@ -205,6 +205,7 @@ public static class IocExtensionApp
         services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
         services.AddTransient<IValidator<AuthenticateRequest>, AuthenticatedRequestValidator>();
         services.AddTransient<IValidator<UpdateImageProfileRequest>, UpdateImageProfileRequestValidator>();
+        services.AddTransient<IValidator<GenerateSecurityCodeRequest>, GenerateSecurityCodeRequestValidator>();
     }
 
     private static void InjectPackages(IServiceCollection services)
