@@ -56,7 +56,7 @@ public class JwtMiddleware
                     ValidateAudience = true,
                     ValidAudience = audience,
                     ClockSkew = TimeSpan.Zero
-                }, out var validatedToken);
+                }, out _);
                 
                 context.User = principal;
             }
