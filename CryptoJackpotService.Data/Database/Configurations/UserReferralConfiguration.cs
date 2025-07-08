@@ -8,6 +8,7 @@ public class UserReferralConfiguration : IEntityTypeConfiguration<UserReferral>
 {
     public void Configure(EntityTypeBuilder<UserReferral> builder)
     {
+        builder.ToTable("user_referral");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.UsedSecurityCode).IsRequired().HasMaxLength(50);
         builder.Property(x => x.CreatedAt).IsRequired();
