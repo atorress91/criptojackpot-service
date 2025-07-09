@@ -62,4 +62,4 @@ AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 app.MapHealthChecks("/health");
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
