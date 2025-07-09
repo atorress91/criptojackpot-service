@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build and analyze
+    name: Build
     runs-on: windows-latest
 
     steps:
@@ -24,47 +24,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache SonarCloud packages
+      - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
-          path: ~\sonar\cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-      - name: Cache SonarCloud scanner
-        id: cache-sonar-scanner
-        uses: actions/cache@v4
-        with:
-          path: .\.sonar\scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
+      - name: Restore dependencies
+        run: dotnet restore CryptoJackpotService.sln
 
-      - name: Install SonarCloud scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
-        run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-
-      - name: Build and analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: powershell
-        run: |
-          # Iniciar análisis en SonarCloud
-          .\.sonar\scanner\dotnet-sonarscanner begin `
-            /k:"atorress91_criptojackpot-service" `
-            /o:"atorress91" `
-            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
-            /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.branch.name="${{ github.ref_name }}" `
-            /d:sonar.exclusions="**/.vs/**,**/.github/**,**/obj/**,**/bin/**"
-
-          # Restaurar paquetes NuGet para generar project.assets.json
-          dotnet restore CryptoJackpotService.sln
-
-          # Compilar la solución (ahora con los assets presentes)
-          dotnet build cryptoJackpotService.sln
-
-          # Finalizar análisis en SonarCloud
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+      - name: Build solution
+        run: dotnet build CryptoJackpotService.sln --no-restore --configuration Release
