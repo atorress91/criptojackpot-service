@@ -2,10 +2,22 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using CryptoJackpotService.Core.Middlewares;
 using CryptoJackpotService.Ioc;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization();
+
+var envFile = builder.Environment.IsDevelopment() 
+    ? ".env.local" 
+    : ".env.prod";
+Env.Load(envFile);
+
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // culturas soportadas
 var supportedCultures = new[] { "en", "es" };

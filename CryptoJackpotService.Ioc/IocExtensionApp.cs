@@ -82,23 +82,16 @@ public static class IocExtensionApp
 
     private static void InjectConfiguration(IServiceCollection services)
     {
-        var serviceProvider = services.BuildServiceProvider();
-        var env = serviceProvider.GetRequiredService<IHostEnvironment>();
-        var lowerCaseEnvironment = env.EnvironmentName.ToLower();
-        var executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (executableLocation == null) return;
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(executableLocation)
-            .AddJsonFile($"appsettings.{lowerCaseEnvironment}.json", false, true)
-            .AddEnvironmentVariables();
-
-        var configuration = builder.Build();
-        var appSettingsSection = configuration.GetSection("AppSettings");
-
-        services.Configure<ApplicationConfiguration>(appSettingsSection);
+        var serviceProvider  = services.BuildServiceProvider();
+        var configuration    = serviceProvider.GetRequiredService<IConfiguration>();
+        
+        services.Configure<ApplicationConfiguration>(
+            configuration.GetSection("AppSettings")
+        );
+        
         services.AddSingleton(configuration);
     }
-
+    
     private static void InjectSwagger(IServiceCollection services)
         => services.AddSwaggerGen(c =>
         {

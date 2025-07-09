@@ -14,7 +14,7 @@ _ReSharper.Caches/
 # User-specific files
 *.suo
 *.user
-
+*.env
 # DB / cache files
 *.db
 *.db-shm
