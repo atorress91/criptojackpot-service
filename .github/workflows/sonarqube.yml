@@ -1,4 +1,4 @@
-name: SonarQube
+name: SonarCloud
 
 on:
   push:
@@ -51,7 +51,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          # Iniciar SonarCloud analysis
+          # Iniciar análisis en SonarCloud
           .\.sonar\scanner\dotnet-sonarscanner begin `
             /k:"atorress91_criptojackpot-service" `
             /o:"atorress91" `
@@ -60,8 +60,11 @@ jobs:
             /d:sonar.branch.name="${{ github.ref_name }}" `
             /d:sonar.exclusions="**/.vs/**,**/.github/**,**/obj/**,**/bin/**"
 
-          # Compilar solución completa
-          dotnet build cryptoJackpotService.sln --no-restore
+          # Restaurar paquetes NuGet para generar project.assets.json
+          dotnet restore CryptoJackpotService.sln
 
-          # Finalizar SonarCloud analysis
+          # Compilar la solución (ahora con los assets presentes)
+          dotnet build cryptoJackpotService.sln
+
+          # Finalizar análisis en SonarCloud
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
