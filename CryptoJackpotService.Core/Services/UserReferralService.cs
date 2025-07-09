@@ -38,4 +38,6 @@ public class UserReferralService : BaseService, IUserReferralService
         var userReferralDto = _mapper.Map<UserReferralDto>(result);
         return ResultResponse<UserReferralDto>.Ok(userReferralDto);
     }
+    
+    //TODO: Crear metodo para que liste los referidos de un usuario por el id.
 }
