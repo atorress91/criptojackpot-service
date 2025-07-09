@@ -1,4 +1,4 @@
-name: SonarCloud
+name: SonarQube
 
 on:
   push:
@@ -19,7 +19,8 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -50,14 +51,17 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
+          # Iniciar SonarCloud analysis
           .\.sonar\scanner\dotnet-sonarscanner begin `
             /k:"atorress91_criptojackpot-service" `
             /o:"atorress91" `
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
+            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
             /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.branch.name="main" `
+            /d:sonar.branch.name="${{ github.ref_name }}" `
             /d:sonar.exclusions="**/.vs/**,**/.github/**,**/obj/**,**/bin/**"
 
-          dotnet build cryptoJackpotService.sln
+          # Compilar solución completa
+          dotnet build cryptoJackpotService.sln --no-restore
 
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          # Finalizar SonarCloud analysis
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
