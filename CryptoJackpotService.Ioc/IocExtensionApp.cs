@@ -56,8 +56,8 @@ public static class IocExtensionApp
         var appConfig = configuration.GetSection("AppSettings").Get<ApplicationConfiguration>();
 
         if (appConfig?.JwtSettings?.SecretKey == null)
-            throw new ArgumentNullException(nameof(appConfig.JwtSettings.SecretKey),
-                @"The JWT secret key cannot be null. Check your configuration.");
+            throw new InvalidOperationException(
+                "The JWT secret key cannot be null. Check your configuration.");
 
         services.AddAuthentication(options =>
             {
@@ -98,7 +98,7 @@ public static class IocExtensionApp
         
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new ArgumentNullException(nameof(connectionString),
+            throw new InvalidOperationException(
                 "The connection string 'PostgreSqlConnection' was not found or is empty. " +
                 "Make sure it is defined in your .env or appsettings.json file with the correct path (AppSettings__ConnectionStrings__PostgreSqlConnection).");
         }
