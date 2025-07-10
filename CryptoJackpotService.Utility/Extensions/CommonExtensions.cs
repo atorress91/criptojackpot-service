@@ -109,21 +109,25 @@ public static class CommonExtensions
 
     public static string ToJsonString(this object source, JsonSerializerOptions jsonSerializerSettings)
         => JsonSerializer.Serialize(source, jsonSerializerSettings);
-
-    public static IEnumerable<TResult> ZipThree<T1, T2, T3, TResult>(
+    
+    public static IEnumerable<(T1, T2, T3)> ZipThree<T1, T2, T3>(
         this IEnumerable<T1> source,
         IEnumerable<T2> second,
-        IEnumerable<T3> third,
-        Func<T1, T2, T3, TResult> func)
+        IEnumerable<T3> third)
     {
+        if (source is null) throw new ArgumentNullException(nameof(source));
+        if (second is null) throw new ArgumentNullException(nameof(second));
+        if (third is null) throw new ArgumentNullException(nameof(third));
+    
         using var e1 = source.GetEnumerator();
         using var e2 = second.GetEnumerator();
         using var e3 = third.GetEnumerator();
 
         while (e1.MoveNext() && e2.MoveNext() && e3.MoveNext())
-            yield return func(e1.Current, e2.Current, e3.Current);
+        {
+            yield return (e1.Current, e2.Current, e3.Current);
+        }
     }
-
 
     public static string StringUpperNormalize(this string text)
         => text.ToUpper().Replace("İ", "I").Replace("Ş", "S").Replace("Ö", "O").Replace("Ç", "C");
