@@ -443,7 +443,8 @@ public static class CommonExtensions
         => source is { Count: > 0 };
 
     private static bool Assigned<T, TU>(this KeyValuePair<T, TU> pair)
-        => pair.Key != null && pair.Value != null;
+        => !EqualityComparer<T>.Default.Equals(pair.Key, default(T)) &&
+           !EqualityComparer<TU>.Default.Equals(pair.Value, default(TU));
 
     private static bool AssignedKeyValuePair(object source)
     {
