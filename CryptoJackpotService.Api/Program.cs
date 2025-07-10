@@ -64,7 +64,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors();
 
 app.UseAuthentication();
-app.UseMiddleware<JwtMiddleware>();
+// app.UseMiddleware<JwtMiddleware>();
 app.UseAuthorization();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

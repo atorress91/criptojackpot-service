@@ -52,7 +52,6 @@ public static class IocExtensionApp
 
     private static void InjectAuthentication(IServiceCollection services, IConfiguration configuration)
     {
-        // Se obtiene la configuración directamente del IConfiguration en lugar de construir un ServiceProvider.
         var appConfig = configuration.GetSection("AppSettings").Get<ApplicationConfiguration>();
 
         if (appConfig?.JwtSettings?.SecretKey == null)
