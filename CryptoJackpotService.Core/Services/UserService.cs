@@ -69,7 +69,6 @@ public class UserService : BaseService, IUserService
 
         if (referrerUser != null)
         {
-            //TODO: Llamar al servicio de referidos para que lo cree.
             await _userReferralService.CreateUserReferralAsync(new UserReferralRequest
                 { ReferredId = user.Id, ReferrerId = referrerUser.Id, ReferralCode = request.ReferralCode });
         }
