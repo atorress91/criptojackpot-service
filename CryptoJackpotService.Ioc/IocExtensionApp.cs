@@ -25,7 +25,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
@@ -35,26 +34,30 @@ namespace CryptoJackpotService.Ioc;
 
 public static class IocExtensionApp
 {
-    public static void IocAppInjectDependencies(this IServiceCollection services, string[]? args = null)
+    public static void IocAppInjectDependencies(this IServiceCollection services, IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
-        InjectAuthentication(services);
-        InjectConfiguration(services);
+        InjectConfiguration(services, configuration);
+        InjectAuthentication(services, configuration);
+        InjectDatabases(services, configuration);
+        InjectLogging(services, environment);
         InjectSwagger(services);
-        InjectDatabases(services);
-        InjectLogging(services);
         InjectControllersAndDocumentation(services);
         InjectServices(services);
         InjectValidators(services);
         InjectRepositories(services);
         InjectPackages(services);
-        InjectRegisterServiceProvider(services);
         InjectSingletonAndFactories(services);
     }
 
-    private static void InjectAuthentication(IServiceCollection services)
+    private static void InjectAuthentication(IServiceCollection services, IConfiguration configuration)
     {
-        var serviceProvider = services.BuildServiceProvider();
-        var configuration = serviceProvider.GetRequiredService<IOptions<ApplicationConfiguration>>().Value;
+        // Se obtiene la configuración directamente del IConfiguration en lugar de construir un ServiceProvider.
+        var appConfig = configuration.GetSection("AppSettings").Get<ApplicationConfiguration>();
+
+        if (appConfig?.JwtSettings?.SecretKey == null)
+            throw new ArgumentNullException(nameof(appConfig.JwtSettings.SecretKey),
+                @"The JWT secret key cannot be null. Check your configuration.");
 
         services.AddAuthentication(options =>
             {
@@ -63,44 +66,42 @@ public static class IocExtensionApp
             })
             .AddJwtBearer(options =>
             {
-                if (configuration.JwtSettings != null)
+                if (appConfig.JwtSettings != null)
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = configuration.JwtSettings.Issuer,
-                        ValidAudience = configuration.JwtSettings.Audience,
+                        ValidIssuer = appConfig.JwtSettings.Issuer,
+                        ValidAudience = appConfig.JwtSettings.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(configuration.JwtSettings.SecretKey))
+                            Encoding.UTF8.GetBytes(appConfig.JwtSettings.SecretKey))
                     };
             });
     }
 
-    private static void InjectConfiguration(IServiceCollection services)
+    private static void InjectConfiguration(IServiceCollection services, IConfiguration configuration)
     {
-        var serviceProvider  = services.BuildServiceProvider();
-        var configuration    = serviceProvider.GetRequiredService<IConfiguration>();
-        
-        services.Configure<ApplicationConfiguration>(
-            configuration.GetSection("AppSettings")
-        );
-        
-        services.AddSingleton(configuration);
+        services.Configure<ApplicationConfiguration>(configuration.GetSection("AppSettings"));
     }
-    
+
     private static void InjectSwagger(IServiceCollection services)
         => services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "CryptoJackpotService", Version = "v1" });
         });
 
-    private static void InjectDatabases(IServiceCollection services)
+    private static void InjectDatabases(IServiceCollection services, IConfiguration configuration)
     {
-        var appConfig = services.BuildServiceProvider().GetRequiredService<IOptions<ApplicationConfiguration>>().Value;
-
-        var connectionString = appConfig.ConnectionStrings?.PostgreSqlConnection;
+        var connectionString = configuration.GetValue<string>("AppSettings:ConnectionStrings:PostgreSqlConnection");
+        
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new ArgumentNullException(nameof(connectionString),
+                "The connection string 'PostgreSqlConnection' was not found or is empty. " +
+                "Make sure it is defined in your .env or appsettings.json file with the correct path (AppSettings__ConnectionStrings__PostgreSqlConnection).");
+        }
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         var dataSource = dataSourceBuilder.Build();
@@ -113,11 +114,9 @@ public static class IocExtensionApp
         });
     }
 
-    private static void InjectLogging(IServiceCollection services)
+    private static void InjectLogging(IServiceCollection services, IWebHostEnvironment environment)
     {
-        var serviceProvider = services.BuildServiceProvider();
-        var env = serviceProvider.GetRequiredService<IWebHostEnvironment>();
-        var lowerCaseEnvironment = env.EnvironmentName.ToLower();
+        var lowerCaseEnvironment = environment.EnvironmentName.ToLower();
 
         services.AddLogging(config =>
         {
@@ -125,8 +124,8 @@ public static class IocExtensionApp
             config.AddConsole();
             config.AddDebug();
             config.SetMinimumLevel(LogLevel.Debug);
-            
-            config.AddNLog($"$nlog.{lowerCaseEnvironment}.config");
+
+            config.AddNLog($"nlog.{lowerCaseEnvironment}.config");
         });
     }
 
@@ -146,14 +145,9 @@ public static class IocExtensionApp
                 options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver();
             });
 
-        services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver();
-        });
-
         services.AddFluentValidationAutoValidation();
         services.AddFluentValidationClientsideAdapters();
+
         services.AddApiVersioning(config =>
         {
             config.DefaultApiVersion = new ApiVersion(majorVersion, minorVersion);
@@ -201,12 +195,6 @@ public static class IocExtensionApp
 
     private static void InjectPackages(IServiceCollection services)
         => services.AddAutoMapper(x => { x.AddProfile(new MapperProfile()); });
-
-    private static void InjectRegisterServiceProvider(IServiceCollection services)
-    {
-        services.AddSingleton<HttpClient>();
-        services.AddSingleton(services.BuildServiceProvider());
-    }
 
     private static void InjectSingletonAndFactories(IServiceCollection services)
     {

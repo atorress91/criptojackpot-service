@@ -41,7 +41,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 });
 
 builder.Services.AddHealthChecks();
-builder.Services.IocAppInjectDependencies();
+builder.Services.IocAppInjectDependencies(builder.Configuration,builder.Environment);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
