@@ -115,10 +115,19 @@ public static class CommonExtensions
         IEnumerable<T2> second,
         IEnumerable<T3> third)
     {
+      
         if (source is null) throw new ArgumentNullException(nameof(source));
         if (second is null) throw new ArgumentNullException(nameof(second));
         if (third is null) throw new ArgumentNullException(nameof(third));
+        
+        return ZipThreeImpl(source, second, third);
+    }
     
+    private static IEnumerable<(T1, T2, T3)> ZipThreeImpl<T1, T2, T3>(
+        IEnumerable<T1> source,
+        IEnumerable<T2> second,
+        IEnumerable<T3> third)
+    {
         using var e1 = source.GetEnumerator();
         using var e2 = second.GetEnumerator();
         using var e3 = third.GetEnumerator();
