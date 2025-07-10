@@ -10,6 +10,7 @@
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="9.0.6" />
+    <PackageReference Include="System.Collections.Immutable" Version="10.0.0-preview.5.25277.114" />
     <PackageReference Include="System.Text.Encodings.Web" Version="9.0.0" />
   </ItemGroup>
 </Project>
