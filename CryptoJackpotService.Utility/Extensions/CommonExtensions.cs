@@ -591,7 +591,7 @@ public static class CommonExtensions
     }
 
     public static DateTime ToDateTime(this string source)
-        => DateTime.Parse(source);
+        => DateTime.Parse(source, CultureInfo.InvariantCulture);
 
     public static int ToUnixTimeSecond(this DateTime source)
         => ((DateTimeOffset)source).ToUnixTimeSeconds().ToInt32();
