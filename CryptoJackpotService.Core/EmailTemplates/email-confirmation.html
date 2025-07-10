@@ -6,32 +6,27 @@
     <title>Registration Confirmation</title>
     <style type="text/css">
         /* Reset de estilos */
-        body, table, td, a {
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; }
 
-        table, td {
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
-        }
-
-        img {
-            -ms-interpolation-mode: bicubic;
-        }
-
+        /* Estilos del cuerpo */
         body {
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            height: 100% !important;
+            width: 100% !important;
         }
 
         /* Estilos principales */
         .wrapper {
             width: 100%;
             table-layout: fixed;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
             background-color: #f4f4f4;
-            padding-bottom: 40px;
+            padding: 40px 0;
         }
 
         .main {
@@ -96,33 +91,31 @@
             color: #cccccc;
         }
 
+        /* Media Query para responsividad */
         @media screen and (max-width: 600px) {
             .content, .header, .footer {
-                padding: 15px;
+                padding: 15px !important;
             }
-
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
+            .main {
+                width: 100% !important;
             }
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <table class="main" width="100%" style="max-width: 600px; margin: 0 auto;">
+    <table class="main" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; width: 100%;">
         <!-- Header -->
         <tr role="presentation">
-            <td class="header">
+            <td role="presentation" class="header">
                 <h1>CryptoJackpot</h1>
             </td>
         </tr>
         <!-- Contenido -->
         <tr role="presentation">
-            <td class="content">
+            <td role="presentation" class="content">
                 <h2>Welcome {0}!</h2>
-                <p>Thank you for signing up. To complete your registration process, please confirm your email address by
-                    clicking on the activation button.</p>
+                <p>Thank you for signing up. To complete your registration process, please confirm your email address by clicking on the activation button.</p>
                 <p>Date: {1}</p>
                 <div class="button-container">
                     <a href="{2}" class="btn">Activate My Account</a>
@@ -133,7 +126,7 @@
         </tr>
         <!-- Footer -->
         <tr role="presentation">
-            <td class="footer">
+            <td role="presentation" class="footer">
                 © 2025 CryptoJackpot. All rights reserved.
             </td>
         </tr>
