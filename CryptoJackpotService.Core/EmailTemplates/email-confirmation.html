@@ -4,133 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Confirmation</title>
-    <style type="text/css">
-        /* Reset de estilos */
-        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; }
-
-        /* Estilos del cuerpo */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            height: 100% !important;
-            width: 100% !important;
-        }
-
-        /* Estilos principales */
-        .wrapper {
-            width: 100%;
-            table-layout: fixed;
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-            background-color: #f4f4f4;
-            padding: 40px 0;
-        }
-
-        .main {
-            background-color: #ffffff;
-            margin: 0 auto;
-            width: 100%;
-            max-width: 600px;
-            border-spacing: 0;
-            font-family: Arial, sans-serif;
-            color: #333333;
-        }
-
-        .header {
-            background-color: #000000;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            color: #FFA500;
-        }
-
-        .content {
-            padding: 20px;
-            text-align: left;
-            line-height: 1.5;
-        }
-
-        .content h2 {
-            color: #000000;
-            font-size: 22px;
-            margin-bottom: 10px;
-        }
-
-        .content p {
-            margin: 0 0 15px;
-            font-size: 16px;
-        }
-
-        .button-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .btn {
-            background-color: #FFA500;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 15px 25px;
-            border-radius: 4px;
-            display: inline-block;
-            font-size: 16px;
-        }
-
-        .footer {
-            background-color: #000000;
-            padding: 15px;
-            text-align: center;
-            font-size: 12px;
-            color: #cccccc;
-        }
-
-        /* Media Query para responsividad */
-        @media screen and (max-width: 600px) {
-            .content, .header, .footer {
-                padding: 15px !important;
-            }
-            .main {
-                width: 100% !important;
-            }
-        }
-    </style>
 </head>
-<body>
-<div class="wrapper">
-    <table class="main" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; width: 100%;">
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+
+<div style="background-color: #f4f4f4; padding: 40px 0; font-family: Arial, sans-serif;">
+    
+    <div style="background-color: #ffffff; margin: 0 auto; max-width: 600px; color: #333333;">
         <!-- Header -->
-        <tr role="presentation">
-            <td role="presentation" class="header">
-                <h1>CryptoJackpot</h1>
-            </td>
-        </tr>
+        <div style="background-color: #000000; padding: 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px; color: #FFA500;">CryptoJackpot</h1>
+        </div>
+
         <!-- Contenido -->
-        <tr role="presentation">
-            <td role="presentation" class="content">
-                <h2>Welcome {0}!</h2>
-                <p>Thank you for signing up. To complete your registration process, please confirm your email address by clicking on the activation button.</p>
-                <p>Date: {1}</p>
-                <div class="button-container">
-                    <a href="{2}" class="btn">Activate My Account</a>
-                </div>
-                <p>If the button doesn't work, copy and paste the following link into your browser:</p>
-                <p style="word-break: break-all;"><a href="{2}" style="color: #FFA500;">{2}</a></p>
-            </td>
-        </tr>
+        <div style="padding: 20px; text-align: left; line-height: 1.5;">
+            <h2 style="color: #000000; font-size: 22px; margin-top: 0; margin-bottom: 10px;">Welcome {0}!</h2>
+            <p style="margin: 0 0 15px; font-size: 16px;">Thank you for signing up. To complete your registration
+                process, please confirm your email address by clicking on the activation button.</p>
+            <p style="margin: 0 0 15px; font-size: 16px;">Date: {1}</p>
+
+            <!-- Contenedor del Botón -->
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="{2}"
+                   style="background-color: #FFA500; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 4px; display: inline-block; font-size: 16px;">Activate
+                    My Account</a>
+            </div>
+
+            <p style="margin: 0 0 15px; font-size: 16px;">If the button doesn't work, copy and paste the following link
+                into your browser:</p>
+            <p style="margin: 0; font-size: 16px; word-break: break-all;"><a href="{2}" style="color: #FFA500;">{2}</a>
+            </p>
+        </div>
+
         <!-- Footer -->
-        <tr role="presentation">
-            <td role="presentation" class="footer">
-                © 2025 CryptoJackpot. All rights reserved.
-            </td>
-        </tr>
-    </table>
+        <div style="background-color: #000000; padding: 15px; text-align: center; font-size: 12px; color: #cccccc;">
+            © 2025 CryptoJackpot. All rights reserved.
+        </div>
+
+    </div>
 </div>
+
 </body>
 </html>
