@@ -142,7 +142,10 @@ public class UserService : BaseService, IUserService
 
         var updatedUser = await _userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
-
+        
+        if (userDto.ImagePath != null)
+            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+        
         return ResultResponse<UserDto>.Ok(userDto);
     }
 }
