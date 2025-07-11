@@ -112,17 +112,37 @@ public class UserService : BaseService, IUserService
     public async Task<ResultResponse<UserDto>> GenerateNewSecurityCode(long userId)
     {
         var user = await _userRepository.GetUserAsyncById(userId);
-        
+
         if (user is null)
             return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
-        
+
         user.SecurityCode = Guid.NewGuid().ToString();
         var updatedUser = await _userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
-        
+
         if (userDto.ImagePath != null)
             userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
-        
+
+        return ResultResponse<UserDto>.Ok(userDto);
+    }
+
+    public async Task<ResultResponse<UserDto>> UpdateUserAsync(long userId, UpdateUserRequest request)
+    {
+        var user = await _userRepository.GetUserAsyncById(userId);
+
+        if (user is null)
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+
+        user.Name = request.Name;
+        user.LastName = request.LastName;
+        user.Phone = request.Phone;
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+            user.Password = request.Password.EncryptPass();
+
+        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var userDto = _mapper.Map<UserDto>(updatedUser);
+
         return ResultResponse<UserDto>.Ok(userDto);
     }
 }

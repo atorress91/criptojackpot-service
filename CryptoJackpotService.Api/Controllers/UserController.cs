@@ -34,12 +34,20 @@ public class UserController : ControllerBase
         var result = await _userService.UpdateImageProfile(request);
         return result.ToActionResult();
     }
-    
+
     [Authorize]
     [HttpPatch("generate-new-security-code")]
     public async Task<IActionResult> GenerateNewSecurityCode([FromBody] GenerateSecurityCodeRequest request)
     {
         var result = await _userService.GenerateNewSecurityCode(request.UserId);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
+    [HttpPut("{userId:long}")]
+    public async Task<IActionResult> UpdateUserAsync(long userId, [FromBody] UpdateUserRequest request)
+    {
+        var result = await _userService.UpdateUserAsync(userId, request);
         return result.ToActionResult();
     }
 }
