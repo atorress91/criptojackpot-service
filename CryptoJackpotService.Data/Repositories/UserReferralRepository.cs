@@ -20,4 +20,9 @@ public class UserReferralRepository(CryptoJackpotDbContext context) : BaseReposi
             .Include(ur => ur.Referred)
             .FirstAsync(ur => ur.Id == userReferral.Id);
     }
+
+    public async Task<IEnumerable<UserReferral>> GetAllReferralsByUserId(long userId)
+    => await Context.UserReferrals.Where(x=>x.ReferrerId == userId).ToListAsync();
+    
+    
 }
