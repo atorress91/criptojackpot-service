@@ -1,4 +1,4 @@
-﻿using CryptoJackpotService.Models.Request;
+﻿using CryptoJackpotService.Models.Request.DigitalOcean;
 using CryptoJackpotService.Models.Responses;
 
 namespace CryptoJackpotService.Core.Services.IServices;

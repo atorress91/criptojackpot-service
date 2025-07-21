@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Repositories.IRepositories;
-using CryptoJackpotService.Models.DTO;
+using CryptoJackpotService.Models.DTO.Country;
 using CryptoJackpotService.Models.Responses;
 
 namespace CryptoJackpotService.Core.Services;

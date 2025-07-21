@@ -1,5 +1,5 @@
-﻿using CryptoJackpotService.Models.DTO;
-using CryptoJackpotService.Models.Request;
+﻿using CryptoJackpotService.Models.DTO.User;
+using CryptoJackpotService.Models.Request.User;
 using CryptoJackpotService.Models.Responses;
 
 namespace CryptoJackpotService.Core.Services.IServices;

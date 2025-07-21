@@ -1,5 +1,5 @@
 ﻿using CryptoJackpotService.Models.Constants;
-using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Request.Auth;
 using CryptoJackpotService.Models.Resources;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
@@ -16,8 +16,8 @@ public class AuthenticatedRequestValidator : LocalizedValidator<AuthenticateRequ
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
-            .MinimumLength(8).WithMessage(x => Localizer[ValidationMessages.MinLength, 8])
-            .MaximumLength(16).WithMessage(x => Localizer[ValidationMessages.MaxLength, 16])
+            .MinimumLength(8).WithMessage(_ => Localizer[ValidationMessages.MinLength, 8])
+            .MaximumLength(16).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 16])
             .Matches("[A-Z]").WithMessage(Localizer[ValidationMessages.PasswordUppercase])
             .Matches("[a-z]").WithMessage(Localizer[ValidationMessages.PasswordLowercase])
             .Matches("[0-9]").WithMessage(Localizer[ValidationMessages.PasswordNumber])

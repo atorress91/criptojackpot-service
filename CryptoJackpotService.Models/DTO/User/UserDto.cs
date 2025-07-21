@@ -1,4 +1,7 @@
-﻿namespace CryptoJackpotService.Models.DTO;
+﻿using CryptoJackpotService.Models.DTO.Country;
+using CryptoJackpotService.Models.DTO.Role;
+
+namespace CryptoJackpotService.Models.DTO.User;
 
 public class UserDto
 {

@@ -4,7 +4,7 @@ using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.Enums;
-using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Request.DigitalOcean;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
 using Microsoft.Extensions.Localization;

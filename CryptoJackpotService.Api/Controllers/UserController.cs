@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
-using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Request.User;
 using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

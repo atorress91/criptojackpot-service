@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Models.DTO;
+﻿namespace CryptoJackpotService.Models.DTO.Role;
 
 public class RoleDto
 {

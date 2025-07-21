@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Models.Request;
+﻿namespace CryptoJackpotService.Models.Request.Referral;
 
 public class UserReferralRequest
 {

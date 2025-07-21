@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using CryptoJackpotService.Data.Database.Models;
-using CryptoJackpotService.Models.DTO;
-using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.DTO.Country;
+using CryptoJackpotService.Models.DTO.Role;
+using CryptoJackpotService.Models.DTO.User;
+using CryptoJackpotService.Models.DTO.UserReferral;
+using CryptoJackpotService.Models.Request.Referral;
+using CryptoJackpotService.Models.Request.User;
 
 namespace CryptoJackpotService.Core.Mapper;
 

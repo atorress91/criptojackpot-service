@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Models.Request;
+﻿namespace CryptoJackpotService.Models.Request.DigitalOcean;
 
 public class UploadRequest
 {

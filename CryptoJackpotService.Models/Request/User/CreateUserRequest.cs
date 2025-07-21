@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Models.Request;
+﻿namespace CryptoJackpotService.Models.Request.User;
 
 public class CreateUserRequest
 {

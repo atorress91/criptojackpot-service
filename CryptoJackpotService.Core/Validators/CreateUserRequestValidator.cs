@@ -1,5 +1,5 @@
 ﻿using CryptoJackpotService.Models.Constants;
-using CryptoJackpotService.Models.Request;
+using CryptoJackpotService.Models.Request.User;
 using CryptoJackpotService.Models.Resources;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
@@ -22,8 +22,8 @@ public class CreateUserRequestValidator : LocalizedValidator<CreateUserRequest>
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
-            .MinimumLength(8).WithMessage(x => Localizer[ValidationMessages.MinLength, 8])
-            .MaximumLength(16).WithMessage(x => Localizer[ValidationMessages.MaxLength, 16])
+            .MinimumLength(8).WithMessage(_ => Localizer[ValidationMessages.MinLength, 8])
+            .MaximumLength(16).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 16])
             .Matches("[A-Z]").WithMessage(Localizer[ValidationMessages.PasswordUppercase])
             .Matches("[a-z]").WithMessage(Localizer[ValidationMessages.PasswordLowercase])
             .Matches("[0-9]").WithMessage(Localizer[ValidationMessages.PasswordNumber])
@@ -39,26 +39,26 @@ public class CreateUserRequestValidator : LocalizedValidator<CreateUserRequest>
 
         RuleFor(x => x.StatePlace)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
-            .MaximumLength(100).WithMessage(x => Localizer[ValidationMessages.MaxLength, 100]);
+            .MaximumLength(100).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 100]);
 
         RuleFor(x => x.City)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
-            .MaximumLength(100).WithMessage(x => Localizer[ValidationMessages.MaxLength, 100]);
+            .MaximumLength(100).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 100]);
 
         RuleFor(x => x.Address)
-            .MaximumLength(200).WithMessage(x => Localizer[ValidationMessages.MaxLength, 200])
+            .MaximumLength(200).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 200])
             .When(x => !string.IsNullOrEmpty(x.Address));
 
         RuleFor(x => x.ImagePath)
-            .MaximumLength(500).WithMessage(x => Localizer[ValidationMessages.MaxLength, 500])
+            .MaximumLength(500).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 500])
             .When(x => !string.IsNullOrEmpty(x.ImagePath));
 
         RuleFor(x => x.GoogleAccessToken)
-            .MaximumLength(2000).WithMessage(x => Localizer[ValidationMessages.MaxLength, 2000])
+            .MaximumLength(2000).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 2000])
             .When(x => !string.IsNullOrEmpty(x.GoogleAccessToken));
 
         RuleFor(x => x.GoogleRefreshToken)
-            .MaximumLength(2000).WithMessage(x => Localizer[ValidationMessages.MaxLength, 2000])
+            .MaximumLength(2000).WithMessage(_ => Localizer[ValidationMessages.MaxLength, 2000])
             .When(x => !string.IsNullOrEmpty(x.GoogleRefreshToken));
     }
 }
