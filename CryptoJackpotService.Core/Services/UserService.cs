@@ -148,4 +148,17 @@ public class UserService : BaseService, IUserService
         
         return ResultResponse<UserDto>.Ok(userDto);
     }
+
+    public async Task<ResultResponse<UserDto>> GetUserAsyncById(long userId)
+    {
+        var user = await _userRepository.GetUserAsyncById(userId);
+        if (user is null)
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+        
+        var userDto = _mapper.Map<UserDto>(user);
+        if (userDto.ImagePath != null)
+            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+        
+        return ResultResponse<UserDto>.Ok(userDto);
+    }
 }

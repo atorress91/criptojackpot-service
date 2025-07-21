@@ -50,4 +50,12 @@ public class UserController : ControllerBase
         var result = await _userService.UpdateUserAsync(userId, request);
         return result.ToActionResult();
     }
+
+    [Authorize]
+    [HttpGet("{userId:long}")]
+    public async Task<IActionResult> GetUserByIdAsync([FromRoute] long userId)
+    {
+        var result = await _userService.GetUserAsyncById(userId);
+        return result.ToActionResult();
+    }
 }

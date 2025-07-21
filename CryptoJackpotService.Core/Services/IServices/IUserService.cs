@@ -10,4 +10,5 @@ public interface IUserService
     Task<ResultResponse<UserDto>> UpdateImageProfile(UpdateImageProfileRequest request);
     Task<ResultResponse<UserDto>> GenerateNewSecurityCode(long userId);
     Task<ResultResponse<UserDto>> UpdateUserAsync(long userId, UpdateUserRequest request);
+    Task<ResultResponse<UserDto>> GetUserAsyncById(long userId);
 }
