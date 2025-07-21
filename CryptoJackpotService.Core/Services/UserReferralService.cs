@@ -42,9 +42,9 @@ public class UserReferralService : BaseService, IUserReferralService
     //TODO: Crear metodo para que liste los referidos de un usuario por el id.
     public async Task<ResultResponse<IEnumerable<UserReferralDto>>> GetReferralsAsync(long userId)
     {
-        var referrers = await _userReferralRepository.GetAllReferralsByUserId(userId);
+        var referrals = await _userReferralRepository.GetAllReferralsByUserId(userId);
         
-        var referralsDto = _mapper.Map<IEnumerable<UserReferralDto>>(referrers);
+        var referralsDto = _mapper.Map<IEnumerable<UserReferralDto>>(referrals);
         return ResultResponse<IEnumerable<UserReferralDto>>.Ok(referralsDto);
     }
 }
