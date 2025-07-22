@@ -1,4 +1,5 @@
 ﻿using CryptoJackpotService.Data.Database;
+using CryptoJackpotService.Data.Database.Custom;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +10,12 @@ public class UserReferralRepository(CryptoJackpotDbContext context) : BaseReposi
 {
     public async Task<UserReferral?> CheckIfUserIsReferred(long userId)
         => await Context.UserReferrals.FirstOrDefaultAsync(x => x.ReferredId == userId);
-    
+
     public async Task<UserReferral> CreateUserReferralAsync(UserReferral userReferral)
     {
         await Context.UserReferrals.AddAsync(userReferral);
         await Context.SaveChangesAsync();
-        
+
         return await Context.UserReferrals
             .Include(ur => ur.Referrer)
             .Include(ur => ur.Referred)
@@ -22,7 +23,17 @@ public class UserReferralRepository(CryptoJackpotDbContext context) : BaseReposi
     }
 
     public async Task<IEnumerable<UserReferral>> GetAllReferralsByUserId(long userId)
-    => await Context.UserReferrals.Where(x=>x.ReferrerId == userId).ToListAsync();
-    
-    
+        => await Context.UserReferrals.Where(x => x.ReferrerId == userId).ToListAsync();
+
+    public async Task<IEnumerable<UserReferralWithStats>> GetReferralStatsAsync(long userId)
+        => await Context.UserReferrals
+            .Where(ur => ur.ReferrerId == userId)
+            .Select(ur => new UserReferralWithStats
+            {
+                UsedSecurityCode = ur.UsedSecurityCode,
+                RegisterDate = ur.Referred.CreatedAt,
+                FullName = ur.Referred.Name + " " + ur.Referred.LastName,
+                Email = ur.Referred.Email,
+            })
+            .ToListAsync();
 }

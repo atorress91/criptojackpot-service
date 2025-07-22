@@ -22,7 +22,7 @@ public class UserReferralController : ControllerBase
     [HttpGet("{userId:long}")]
     public async Task<IActionResult> GetUserReferralsAsync([FromRoute] long userId)
     {
-        var result = await _userReferralService.GetReferralsAsync(userId);
+        var result = await _userReferralService.GetReferralStatsAsync(userId);
         return result.ToActionResult();
     }
 }

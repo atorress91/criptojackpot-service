@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CryptoJackpotService.Data.Database.Custom;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Models.DTO.Country;
 using CryptoJackpotService.Models.DTO.Role;
@@ -27,5 +28,6 @@ public class MapperProfile : Profile
         CreateMap<Country, CountryDto>();
         CreateMap<Role, RoleDto>();
         CreateMap<UserReferral, UserReferralDto>();
+        CreateMap<UserReferralWithStats, UserReferralStatsDto>();
     }
 }
