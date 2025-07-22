@@ -7,5 +7,5 @@ namespace CryptoJackpotService.Core.Services.IServices;
 public interface IUserReferralService
 {
     Task<ResultResponse<UserReferralDto>> CreateUserReferralAsync(UserReferralRequest request);
-    Task<ResultResponse<IEnumerable<UserReferralStatsDto>>> GetReferralStatsAsync(long userId);
+    Task<ResultResponse<UserReferralStatsDto>> GetReferralStatsAsync(long userId);
 }
