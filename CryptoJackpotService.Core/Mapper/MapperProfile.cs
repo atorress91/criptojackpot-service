@@ -28,6 +28,15 @@ public class MapperProfile : Profile
         CreateMap<Country, CountryDto>();
         CreateMap<Role, RoleDto>();
         CreateMap<UserReferral, UserReferralDto>();
-        CreateMap<UserReferralWithStats, UserReferralStatsDto>();
+        CreateMap<UserReferralWithStats, UserReferralDto>();
+        CreateMap<IEnumerable<UserReferralWithStats>, UserReferralStatsDto>()
+            .ForMember(dest => dest.TotalEarnings, 
+                opt => opt.MapFrom(src => src.Count() * 10))
+            .ForMember(dest => dest.LastMonthEarnings, 
+                opt => opt.MapFrom(src => src.Count(r => r.RegisterDate >= DateTime.Now.AddMonths(-1)) * 10))
+            .ForMember(dest => dest.Referrals, 
+                opt => opt.MapFrom(src => src)); 
+
+
     }
 }

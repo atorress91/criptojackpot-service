@@ -42,8 +42,9 @@ public class UserReferralService : BaseService, IUserReferralService
     public async Task<ResultResponse<IEnumerable<UserReferralStatsDto>>> GetReferralStatsAsync(long userId)
     {
         var referralStats = await _userReferralRepository.GetReferralStatsAsync(userId);
-        var referralStatsDto = _mapper.Map<IEnumerable<UserReferralStatsDto>>(referralStats);
         
-        return ResultResponse<IEnumerable<UserReferralStatsDto>>.Ok(referralStatsDto);
+        var referralStatsDto = _mapper.Map<UserReferralStatsDto>(referralStats);
+    
+        return ResultResponse<IEnumerable<UserReferralStatsDto>>.Ok([referralStatsDto]);
     }
 }
