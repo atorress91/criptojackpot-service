@@ -6,9 +6,9 @@ namespace CryptoJackpotService.Core.Validators;
 
 public abstract class LocalizedValidator<T> : AbstractValidator<T>
 {
-    protected readonly IStringLocalizer<SharedResource> Localizer;
+    protected readonly IStringLocalizer<ISharedResource> Localizer;
 
-    protected LocalizedValidator(IStringLocalizer<SharedResource> localizer)
+    protected LocalizedValidator(IStringLocalizer<ISharedResource> localizer)
     {
         Localizer = localizer;
     }

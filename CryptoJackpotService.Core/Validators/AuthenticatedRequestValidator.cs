@@ -8,7 +8,7 @@ namespace CryptoJackpotService.Core.Validators;
 
 public class AuthenticatedRequestValidator : LocalizedValidator<AuthenticateRequest>
 {
-    public AuthenticatedRequestValidator(IStringLocalizer<SharedResource> localizer) : base(localizer)
+    public AuthenticatedRequestValidator(IStringLocalizer<ISharedResource> localizer) : base(localizer)
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])

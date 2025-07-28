@@ -3,8 +3,8 @@
 /// <summary>
 /// Clase marcador para los recursos compartidos de localización
 /// </summary>
-public class SharedResource
+public interface ISharedResource
 {
     // Esta clase está vacía intencionalmente.
-    // Se usa como tipo marcador para IStringLocalizer<SharedResource>
+    // Se usa como tipo marcador para IStringLocalizer<ISharedResource>
 }

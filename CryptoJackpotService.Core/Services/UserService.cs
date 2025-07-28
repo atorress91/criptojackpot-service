@@ -21,7 +21,7 @@ public class UserService : BaseService, IUserService
     private readonly IBrevoService _brevoService;
     private readonly ILogger<UserService> _logger;
     private readonly IMapper _mapper;
-    private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly IStringLocalizer<ISharedResource> _localizer;
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
     private readonly IUserReferralService _userReferralService;
 
@@ -30,7 +30,7 @@ public class UserService : BaseService, IUserService
         IUserRepository userRepository,
         IBrevoService brevoService,
         ILogger<UserService> logger,
-        IStringLocalizer<SharedResource> localizer,
+        IStringLocalizer<ISharedResource> localizer,
         IDigitalOceanStorageService digitalOceanStorageService,
         IUserReferralService userReferralService) : base(mapper)
     {

@@ -10,9 +10,9 @@ namespace CryptoJackpotService.Core.Filters;
 
 public class LocalizedValidationFilter : IActionFilter
 {
-    private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly IStringLocalizer<ISharedResource> _localizer;
 
-    public LocalizedValidationFilter(IStringLocalizer<SharedResource> localizer)
+    public LocalizedValidationFilter(IStringLocalizer<ISharedResource> localizer)
     {
         _localizer = localizer;
     }

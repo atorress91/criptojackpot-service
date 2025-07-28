@@ -8,7 +8,7 @@ namespace CryptoJackpotService.Core.Validators;
 
 public class CreateUserRequestValidator : LocalizedValidator<CreateUserRequest>
 {
-    public CreateUserRequestValidator(IStringLocalizer<SharedResource> localizer) : base(localizer)
+    public CreateUserRequestValidator(IStringLocalizer<ISharedResource> localizer) : base(localizer)
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required]);

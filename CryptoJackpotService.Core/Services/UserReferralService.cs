@@ -16,10 +16,10 @@ public class UserReferralService : BaseService, IUserReferralService
 {
     private readonly IUserReferralRepository _userReferralRepository;
     private readonly IMapper _mapper;
-    private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly IStringLocalizer<ISharedResource> _localizer;
     
     public UserReferralService(IUserReferralRepository userReferralRepository, IMapper mapper,
-    IStringLocalizer<SharedResource> localizer): base(mapper)
+    IStringLocalizer<ISharedResource> localizer): base(mapper)
     {
         _mapper = mapper;
         _userReferralRepository = userReferralRepository;

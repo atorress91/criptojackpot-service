@@ -35,7 +35,7 @@ public class ExceptionMiddleware
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var localizer = context.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
+        var localizer = context.RequestServices.GetRequiredService<IStringLocalizer<ISharedResource>>();
         
         context.Response.ContentType = MediaTypeNames.Application.Json;
 
@@ -71,7 +71,7 @@ public class ExceptionMiddleware
         return context.Response.WriteAsync(response.ToJsonString());
     }
 
-    private static Task HandleGenericException(HttpContext context, IStringLocalizer<SharedResource> localizer)
+    private static Task HandleGenericException(HttpContext context, IStringLocalizer<ISharedResource> localizer)
     {
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         

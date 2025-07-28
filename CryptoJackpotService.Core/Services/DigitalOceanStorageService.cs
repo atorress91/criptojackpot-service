@@ -16,8 +16,8 @@ public class DigitalOceanStorageService : IDigitalOceanStorageService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly ApplicationConfiguration _settings;
-    private readonly IStringLocalizer<SharedResource> _localizer;
-    public DigitalOceanStorageService(IOptions<ApplicationConfiguration> settings, IStringLocalizer<SharedResource> localizer)
+    private readonly IStringLocalizer<ISharedResource> _localizer;
+    public DigitalOceanStorageService(IOptions<ApplicationConfiguration> settings, IStringLocalizer<ISharedResource> localizer)
     {
         _settings = settings.Value;
         _localizer = localizer;

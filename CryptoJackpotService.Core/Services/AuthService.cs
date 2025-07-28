@@ -18,14 +18,14 @@ public class AuthService : BaseService, IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IOptions<ApplicationConfiguration> _appSettings;
-    private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly IStringLocalizer<ISharedResource> _localizer;
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
 
     public AuthService(
         IMapper mapper,
         IUserRepository userRepository,
         IOptions<ApplicationConfiguration> appSettings,
-        IStringLocalizer<SharedResource> localizer,
+        IStringLocalizer<ISharedResource> localizer,
         IDigitalOceanStorageService digitalOceanStorageService)
         : base(mapper)
     {

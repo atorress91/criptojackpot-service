@@ -8,7 +8,7 @@ namespace CryptoJackpotService.Core.Validators;
 
 public class GenerateSecurityCodeRequestValidator : LocalizedValidator<GenerateSecurityCodeRequest>
 {
-    public GenerateSecurityCodeRequestValidator(IStringLocalizer<SharedResource> localizer):base(localizer)
+    public GenerateSecurityCodeRequestValidator(IStringLocalizer<ISharedResource> localizer):base(localizer)
     {
         RuleFor(x => x.UserId)
             .NotNull().WithMessage(localizer[ValidationMessages.Required]);
