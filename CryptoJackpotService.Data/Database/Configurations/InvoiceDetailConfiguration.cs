@@ -6,14 +6,15 @@ namespace CryptoJackpotService.Data.Database.Configurations;
 
 public class InvoiceDetailConfiguration : IEntityTypeConfiguration<InvoiceDetail>
 {
+    private const string DecimalColumnType = "decimal(18,2)";
     public void Configure(EntityTypeBuilder<InvoiceDetail> builder)
     {
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.UnitPrice).IsRequired().HasColumnType("decimal(18,2)");
+        builder.Property(e => e.UnitPrice).IsRequired().HasColumnType(DecimalColumnType);
         builder.Property(e => e.Quantity).IsRequired();
-        builder.Property(e => e.SubTotal).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.Tax).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.Total).IsRequired().HasColumnType("decimal(18,2)");
+        builder.Property(e => e.SubTotal).IsRequired().HasColumnType(DecimalColumnType);
+        builder.Property(e => e.Tax).IsRequired().HasColumnType(DecimalColumnType);
+        builder.Property(e => e.Total).IsRequired().HasColumnType(DecimalColumnType);
 
         builder.HasOne(e => e.Invoice)
             .WithMany(e => e.Details)
