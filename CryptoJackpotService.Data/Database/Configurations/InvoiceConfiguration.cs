@@ -1,4 +1,5 @@
 ﻿using CryptoJackpotService.Data.Database.Models;
+using CryptoJackpotService.Models.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,12 +10,12 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
     public void Configure(EntityTypeBuilder<Invoice> builder)
     {
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.InvoiceNumber).IsRequired().HasColumnType("text").HasMaxLength(50);
+        builder.Property(e => e.InvoiceNumber).IsRequired().HasColumnType(ColumnTypes.Text).HasMaxLength(50);
         builder.Property(e => e.InvoiceDate).IsRequired();
-        builder.Property(e => e.SubTotal).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.Tax).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.Total).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.Notes).HasColumnType("text").HasMaxLength(500);
+        builder.Property(e => e.SubTotal).IsRequired().HasColumnType(ColumnTypes.Decimal);
+        builder.Property(e => e.Tax).IsRequired().HasColumnType(ColumnTypes.Decimal);
+        builder.Property(e => e.Total).IsRequired().HasColumnType(ColumnTypes.Decimal);
+        builder.Property(e => e.Notes).HasColumnType(ColumnTypes.Text).HasMaxLength(500);
         builder.Property(e => e.Status).IsRequired()
             .HasConversion<string>()
             .HasMaxLength(50);

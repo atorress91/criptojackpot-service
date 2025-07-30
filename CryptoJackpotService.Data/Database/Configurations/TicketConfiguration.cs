@@ -1,4 +1,5 @@
 ﻿using CryptoJackpotService.Data.Database.Models;
+using CryptoJackpotService.Models.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,10 +10,10 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
     public void Configure(EntityTypeBuilder<Ticket> builder)
     {
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.PurchaseAmount).IsRequired().HasColumnType("decimal(18,2)");
+        builder.Property(e => e.PurchaseAmount).IsRequired().HasColumnType(ColumnTypes.Decimal);
         builder.Property(e => e.PurchaseDate).IsRequired();
         builder.Property(e => e.Status).IsRequired();
-        builder.Property(e => e.TransactionId).IsRequired().HasColumnType("text").HasMaxLength(100);
+        builder.Property(e => e.TransactionId).IsRequired().HasColumnType(ColumnTypes.Text).HasMaxLength(100);
         builder.Property(e => e.IsGift).IsRequired();
         builder.Property(e => e.CreatedAt).IsRequired();
         builder.Property(e => e.UpdatedAt).IsRequired();

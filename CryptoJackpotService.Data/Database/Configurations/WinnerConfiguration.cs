@@ -1,4 +1,5 @@
 ﻿using CryptoJackpotService.Data.Database.Models;
+using CryptoJackpotService.Models.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,8 +13,8 @@ public class WinnerConfiguration : IEntityTypeConfiguration<Winner>
         builder.Property(e => e.Status).IsRequired();
         builder.Property(e => e.WinDate).IsRequired();
         builder.Property(e => e.ClaimDate);
-        builder.Property(e => e.DeliveryAddress).IsRequired().HasColumnType("text").HasMaxLength(500);
-        builder.Property(e => e.DeliveryStatus).IsRequired().HasColumnType("text").HasMaxLength(50);
+        builder.Property(e => e.DeliveryAddress).IsRequired().HasColumnType(ColumnTypes.Text).HasMaxLength(500);
+        builder.Property(e => e.DeliveryStatus).IsRequired().HasColumnType(ColumnTypes.Text).HasMaxLength(50);
         builder.Property(e => e.HasSelectedCashAlternative).IsRequired();
         builder.Property(e => e.CreatedAt).IsRequired();
         builder.Property(e => e.UpdatedAt).IsRequired();
