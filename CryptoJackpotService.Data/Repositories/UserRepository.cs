@@ -36,7 +36,10 @@ public class UserRepository(CryptoJackpotDbContext context) : BaseRepository(con
         await Context.SaveChangesAsync();
         return user;
     }
-    
+
     public async Task<User?> GetUserBySecurityCodeAsync(string securityCode)
         => await Context.Users.FirstOrDefaultAsync(u => u.SecurityCode == securityCode);
+
+    public async Task<IEnumerable<User>?> GetAllUsersAsync(long excludeUserId)
+        => await Context.Users.Where(u => u.Id != excludeUserId).ToListAsync();
 }

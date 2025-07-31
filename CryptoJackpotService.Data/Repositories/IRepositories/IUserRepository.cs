@@ -9,4 +9,5 @@ public interface IUserRepository
     Task<User?> GetUserAsyncByEmail(string email);
     Task<User> UpdateUserAsync(User user);
     Task<User?> GetUserBySecurityCodeAsync(string securityCode);
+    Task<IEnumerable<User>?> GetAllUsersAsync(long excludeUserId);
 }

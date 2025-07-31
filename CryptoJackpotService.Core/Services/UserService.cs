@@ -162,4 +162,16 @@ public class UserService : BaseService, IUserService
         
         return ResultResponse<UserDto>.Ok(userDto);
     }
+
+    public async Task<ResultResponse<IEnumerable<UserDto>>> GetAllUsersAsync(long excludeUserId)
+    {
+        var users = await _userRepository.GetAllUsersAsync(excludeUserId);
+        if(users is null)
+            return ResultResponse<IEnumerable<UserDto>>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+        
+        var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+        var enumerable = userDtos.ToList();
+        
+        return ResultResponse<IEnumerable<UserDto>>.Ok(enumerable);
+    }
 }

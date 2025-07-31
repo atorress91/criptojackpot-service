@@ -11,4 +11,5 @@ public interface IUserService
     Task<ResultResponse<UserDto>> GenerateNewSecurityCode(long userId);
     Task<ResultResponse<UserDto>> UpdateUserAsync(long userId, UpdateUserRequest request);
     Task<ResultResponse<UserDto>> GetUserAsyncById(long userId);
+    Task<ResultResponse<IEnumerable<UserDto>>> GetAllUsersAsync(long excludeUserId);
 }

@@ -58,4 +58,12 @@ public class UserController : ControllerBase
         var result = await _userService.GetUserAsyncById(userId);
         return result.ToActionResult();
     }
+
+    [Authorize]
+    [HttpGet("get-all-users")]
+    public async Task<IActionResult> GetAllUsersAsync([FromQuery] long excludeUserId)
+    {
+        var result = await _userService.GetAllUsersAsync(excludeUserId);
+        return result.ToActionResult();
+    }
 }
