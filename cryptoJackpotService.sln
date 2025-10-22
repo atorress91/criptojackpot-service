@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Models
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Utility", "CryptoJackpotService.Utility\CryptoJackpotService.Utility.csproj", "{EBD6B706-4906-4454-897F-5C4F3DEBADAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoJackpotService.Tests", "CryptoJackpotService.Tests\CryptoJackpotService.Tests.csproj", "{5F5A3E2B-9A1C-4F39-9C2B-6A1B5E8D1234}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBD6B706-4906-4454-897F-5C4F3DEBADAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F5A3E2B-9A1C-4F39-9C2B-6A1B5E8D1234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F5A3E2B-9A1C-4F39-9C2B-6A1B5E8D1234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F5A3E2B-9A1C-4F39-9C2B-6A1B5E8D1234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F5A3E2B-9A1C-4F39-9C2B-6A1B5E8D1234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
