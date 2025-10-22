@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using CryptoJackpotService.Core.Mapper;
 using CryptoJackpotService.Core.Services;
 using CryptoJackpotService.Core.Services.IServices;
@@ -7,7 +6,6 @@ using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.Request.User;
-using CryptoJackpotService.Models.Responses;
 using CryptoJackpotService.Models.Enums;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -24,9 +22,9 @@ public class UserServiceTests
         return config.CreateMapper();
     }
 
-    private static IStringLocalizer<CryptoJackpotService.Models.Resources.ISharedResource> CreateLocalizer()
+    private static IStringLocalizer<Models.Resources.ISharedResource> CreateLocalizer()
     {
-        var mock = new Mock<IStringLocalizer<CryptoJackpotService.Models.Resources.ISharedResource>>();
+        var mock = new Mock<IStringLocalizer<Models.Resources.ISharedResource>>();
         mock.Setup(l => l[It.IsAny<string>()])
             .Returns((string key) => new LocalizedString(key, key));
         return mock.Object;
