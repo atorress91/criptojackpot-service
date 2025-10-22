@@ -12,9 +12,12 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CryptoJackpotService.Data\CryptoJackpotService.Data.csproj" />
+    <ProjectReference Include="..\CryptoJackpotService.Core\CryptoJackpotService.Core.csproj" />
+    <ProjectReference Include="..\CryptoJackpotService.Models\CryptoJackpotService.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
