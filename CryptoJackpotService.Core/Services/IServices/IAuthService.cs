@@ -7,4 +7,5 @@ namespace CryptoJackpotService.Core.Services.IServices;
 public interface IAuthService
 {
     Task<ResultResponse<UserDto?>> AuthenticateAsync(AuthenticateRequest request);
+    Task<ResultResponse<string>> ConfirmEmailAsync(string token);
 }

@@ -55,4 +55,24 @@ public class AuthService : BaseService, IAuthService
 
         return ResultResponse<UserDto?>.Ok(userDto);
     }
+
+    public async Task<ResultResponse<string>> ConfirmEmailAsync(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+            return ResultResponse<string>.Failure(ErrorType.BadRequest, _localizer[ValidationMessages.InvalidConfirmationToken]);
+
+        var user = await _userRepository.GetUserBySecurityCodeAsync(token);
+
+        if (user == null)
+            return ResultResponse<string>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.InvalidConfirmationToken]);
+
+        if (user.Status)
+            return ResultResponse<string>.Failure(ErrorType.BadRequest, _localizer[ValidationMessages.EmailAlreadyConfirmed]);
+
+        user.Status = true;
+        user.SecurityCode = null; 
+        await _userRepository.UpdateUserAsync(user);
+
+        return ResultResponse<string>.Ok(_localizer[ValidationMessages.EmailConfirmedSuccessfully]);
+    }
 }

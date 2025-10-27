@@ -23,4 +23,7 @@
         public const string NewPasswordMustBeDifferent = "NewPasswordMustBeDifferent";
         public const string PasswordResetEmailSent = "PasswordResetEmailSent";
         public const string InvalidOrExpiredSecurityCode = "InvalidOrExpiredSecurityCode";
+        public const string EmailConfirmedSuccessfully = "EmailConfirmedSuccessfully";
+        public const string InvalidConfirmationToken = "InvalidConfirmationToken";
+        public const string EmailAlreadyConfirmed = "EmailAlreadyConfirmed";
     }

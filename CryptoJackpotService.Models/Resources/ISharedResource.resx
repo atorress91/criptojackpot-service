@@ -154,6 +154,15 @@
   <data name="InvalidOrExpiredSecurityCode" xml:space="preserve">
     <value>Invalid or expired security code</value>
   </data>
+  <data name="EmailConfirmedSuccessfully" xml:space="preserve">
+    <value>Email confirmed successfully</value>
+  </data>
+  <data name="InvalidConfirmationToken" xml:space="preserve">
+    <value>Invalid confirmation token</value>
+  </data>
+  <data name="EmailAlreadyConfirmed" xml:space="preserve">
+    <value>Email has already been confirmed</value>
+  </data>
   <data name="FailedToSendEmail" xml:space="preserve">
     <value>Failed to send email</value>
   </data>
@@ -161,3 +170,4 @@
     <value>Security code must be 6 digits</value>
   </data>
 </root>
+

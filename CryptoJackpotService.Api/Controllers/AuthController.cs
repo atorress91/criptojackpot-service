@@ -27,4 +27,13 @@ public class AuthController : ControllerBase
 
         return result.ToActionResult();
     }
+
+    [AllowAnonymous]
+    [HttpPost("confirm-email/{token}")]
+    public async Task<IActionResult> ConfirmEmail(string token)
+    {
+        var result = await _authService.ConfirmEmailAsync(token);
+
+        return result.ToActionResult();
+    }
 }
