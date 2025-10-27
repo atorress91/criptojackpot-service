@@ -13,4 +13,6 @@ public interface IUserService
     Task<ResultResponse<UserDto>> UpdatePasswordAsync(UpdatePasswordRequest request);
     Task<ResultResponse<UserDto>> GetUserAsyncById(long userId);
     Task<ResultResponse<IEnumerable<UserDto>>> GetAllUsersAsync(long excludeUserId);
+    Task<ResultResponse<string>> RequestPasswordResetAsync(RequestPasswordResetRequest request);
+    Task<ResultResponse<UserDto>> ResetPasswordWithCodeAsync(ResetPasswordWithCodeRequest request);
 }

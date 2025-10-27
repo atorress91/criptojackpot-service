@@ -73,4 +73,44 @@ public class BrevoService : IBrevoService
             return ResultResponse<string>.Failure(ErrorType.Unexpected,ex.Message);
         }
     }
+
+    public async Task<ResultResponse<string>> SendPasswordResetEmailAsync(Dictionary<string, string> data)
+    {
+        var templateResult = await _templateProvider.GetTemplateAsync(Constants.PasswordResetTemplate);
+        if (!templateResult.Success)
+        {
+            return ResultResponse<string>.Failure(ErrorType.BadRequest, templateResult.Message!);
+        }
+
+        var fullName = $"{data["name"]} {data["lastName"]}";
+
+        var templateData = new Dictionary<string, string>
+        {
+            ["{0}"] = fullName,
+            ["{1}"] = data["securityCode"],
+            ["{2}"] = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss")
+        };
+
+        var body = templateResult.Data!.ReplaceHtml(templateData);
+
+        try
+        {
+            var email = new SendSmtpEmail
+            {
+                To = new List<SendSmtpEmailTo> { new(data["user-email"]) },
+                Subject = data["subject"],
+                HtmlContent = body,
+                Sender = new SendSmtpEmailSender(_appConfig.BrevoConfiguration.SenderName, _appConfig.BrevoConfiguration.Email)
+            };
+
+            var result = await _emailApi.SendTransacEmailAsync(email);
+            _logger.LogInformation("Password reset email sent successfully: {MessageId}", result.MessageId);
+            return ResultResponse<string>.Ok(result.MessageId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send password reset email to {Email}", data["user-email"]);
+            return ResultResponse<string>.Failure(ErrorType.Unexpected, ex.Message);
+        }
+    }
 }

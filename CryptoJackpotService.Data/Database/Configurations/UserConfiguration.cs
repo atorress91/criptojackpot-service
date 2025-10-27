@@ -25,6 +25,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.GoogleRefreshToken).HasColumnType(ColumnTypes.Text).HasMaxLength(500);
         builder.Property(e => e.SecurityCode).HasColumnType(ColumnTypes.Text).HasMaxLength(50);
         builder.Property(e => e.CreatedAt).IsRequired();
+        builder.Property(e => e.PasswordResetCodeExpiration);
         builder.Property(e => e.UpdatedAt).IsRequired();
 
         builder.HasIndex(e => e.Email).IsUnique();

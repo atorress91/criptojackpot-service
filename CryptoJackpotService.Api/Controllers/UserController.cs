@@ -74,4 +74,20 @@ public class UserController : ControllerBase
         var result = await _userService.GetAllUsersAsync(excludeUserId);
         return result.ToActionResult();
     }
+
+    [AllowAnonymous]
+    [HttpPost("request-password-reset")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetRequest request)
+    {
+        var result = await _userService.RequestPasswordResetAsync(request);
+        return result.ToActionResult();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("reset-password-with-code")]
+    public async Task<IActionResult> ResetPasswordWithCode([FromBody] ResetPasswordWithCodeRequest request)
+    {
+        var result = await _userService.ResetPasswordWithCodeAsync(request);
+        return result.ToActionResult();
+    }
 }

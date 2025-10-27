@@ -156,13 +156,11 @@ public class UserService : BaseService, IUserService
 
         if (user is null)
             return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
-
-        // Verify current password
+        
         var currentPasswordEncrypted = request.CurrentPassword.EncryptPass();
         if (user.Password != currentPasswordEncrypted)
             return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, _localizer[ValidationMessages.InvalidCurrentPassword]);
-
-        // Update password
+        
         user.Password = request.NewPassword.EncryptPass();
         var updatedUser = await _userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
@@ -196,5 +194,70 @@ public class UserService : BaseService, IUserService
         var enumerable = userDtos.ToList();
         
         return ResultResponse<IEnumerable<UserDto>>.Ok(enumerable);
+    }
+
+    public async Task<ResultResponse<string>> RequestPasswordResetAsync(RequestPasswordResetRequest request)
+    {
+        var user = await _userRepository.GetUserAsyncByEmail(request.Email);
+        
+        if (user is null)
+            return ResultResponse<string>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+        
+        var random = new Random();
+        var securityCode = random.Next(100000, 999999).ToString();
+        
+        user.SecurityCode = securityCode;
+        user.PasswordResetCodeExpiration = DateTime.UtcNow.AddMinutes(15);
+        
+        await _userRepository.UpdateUserAsync(user);
+
+        var emailData = new Dictionary<string, string>
+        {
+            { "name", user.Name },
+            { "lastName", user.LastName },
+            { "securityCode", securityCode },
+            { "user-email", user.Email },
+            { "subject", _localizer["PasswordResetSubject"] }
+        };
+
+        var emailResult = await _brevoService.SendPasswordResetEmailAsync(emailData);
+        if (!emailResult.Success)
+        {
+            _logger.LogWarning("Failed to send password reset email: {Error}", emailResult.Message);
+            return ResultResponse<string>.Failure(ErrorType.Unexpected, _localizer["FailedToSendEmail"]);
+        }
+
+        return ResultResponse<string>.Ok(_localizer[ValidationMessages.PasswordResetEmailSent]);
+    }
+
+    public async Task<ResultResponse<UserDto>> ResetPasswordWithCodeAsync(ResetPasswordWithCodeRequest request)
+    {
+        var user = await _userRepository.GetUserAsyncByEmail(request.Email);
+        
+        if (user is null)
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+        
+        if (string.IsNullOrEmpty(user.SecurityCode) || 
+            user.SecurityCode != request.SecurityCode ||
+            user.PasswordResetCodeExpiration == null || 
+            user.PasswordResetCodeExpiration < DateTime.UtcNow)
+            return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, 
+                _localizer[ValidationMessages.InvalidOrExpiredSecurityCode]);
+
+        if (request.NewPassword != request.ConfirmPassword)
+            return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, 
+                _localizer[ValidationMessages.PasswordsDoNotMatch]);
+        
+        user.Password = request.NewPassword.EncryptPass();
+        user.SecurityCode = null;
+        user.PasswordResetCodeExpiration = null;
+
+        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var userDto = _mapper.Map<UserDto>(updatedUser);
+
+        if (userDto.ImagePath != null)
+            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+
+        return ResultResponse<UserDto>.Ok(userDto);
     }
 }

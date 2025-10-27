@@ -944,6 +944,10 @@ namespace CryptoJackpotService.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password");
 
+                    b.Property<DateTime?>("PasswordResetCodeExpiration")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("password_reset_code_expiration");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(50)
                         .HasColumnType("text")

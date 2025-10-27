@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <root>
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
@@ -142,5 +141,23 @@
   </data>
   <data name="NewPasswordMustBeDifferent" xml:space="preserve">
     <value>La nueva contraseña debe ser diferente de la contraseña actual</value>
+  </data>
+  <data name="EmailConfirmationSubject" xml:space="preserve">
+    <value>Confirma tu Dirección de Correo Electrónico</value>
+  </data>
+  <data name="PasswordResetSubject" xml:space="preserve">
+    <value>Solicitud de Restablecimiento de Contraseña</value>
+  </data>
+  <data name="PasswordResetEmailSent" xml:space="preserve">
+    <value>Correo de restablecimiento de contraseña enviado exitosamente. Por favor revisa tu correo para obtener el código de seguridad.</value>
+  </data>
+  <data name="InvalidOrExpiredSecurityCode" xml:space="preserve">
+    <value>Código de seguridad inválido o expirado</value>
+  </data>
+  <data name="FailedToSendEmail" xml:space="preserve">
+    <value>Error al enviar el correo electrónico</value>
+  </data>
+  <data name="SecurityCodeMustBe6Digits" xml:space="preserve">
+    <value>El código de seguridad debe tener 6 dígitos</value>
   </data>
 </root>
