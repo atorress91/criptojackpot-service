@@ -30,6 +30,9 @@
       <None Update="EmailTemplates\email-confirmation.html">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="EmailTemplates\password-reset.html">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
