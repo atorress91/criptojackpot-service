@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿﻿using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
@@ -191,6 +191,7 @@ public static class IocExtensionApp
         services.AddTransient<IValidator<AuthenticateRequest>, AuthenticatedRequestValidator>();
         services.AddTransient<IValidator<UpdateImageProfileRequest>, UpdateImageProfileRequestValidator>();
         services.AddTransient<IValidator<GenerateSecurityCodeRequest>, GenerateSecurityCodeRequestValidator>();
+        services.AddTransient<IValidator<UpdatePasswordRequest>, UpdatePasswordRequestValidator>();
     }
 
     private static void InjectPackages(IServiceCollection services)

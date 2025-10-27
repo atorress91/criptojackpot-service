@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Models.Constants;
+﻿﻿namespace CryptoJackpotService.Models.Constants;
 
     public static class ValidationMessages
     {
@@ -18,4 +18,7 @@
         public const string InvalidFileType = "InvalidFileType";
         public const string InvalidReferralCode = "InvalidReferralCode";
         public const string AlreadyReferred = "AlreadyReferred";
+        public const string InvalidCurrentPassword = "InvalidCurrentPassword";
+        public const string PasswordsDoNotMatch = "PasswordsDoNotMatch";
+        public const string NewPasswordMustBeDifferent = "NewPasswordMustBeDifferent";
     }

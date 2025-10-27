@@ -44,6 +44,14 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
+    [HttpPatch("update-password")]
+    public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequest request)
+    {
+        var result = await _userService.UpdatePasswordAsync(request);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
     [HttpPut("{userId:long}")]
     public async Task<IActionResult> UpdateUserAsync(long userId, [FromBody] UpdateUserRequest request)
     {

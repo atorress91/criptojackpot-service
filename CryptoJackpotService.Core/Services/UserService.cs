@@ -150,6 +150,29 @@ public class UserService : BaseService, IUserService
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
+    public async Task<ResultResponse<UserDto>> UpdatePasswordAsync(UpdatePasswordRequest request)
+    {
+        var user = await _userRepository.GetUserAsyncById(request.UserId);
+
+        if (user is null)
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+
+        // Verify current password
+        var currentPasswordEncrypted = request.CurrentPassword.EncryptPass();
+        if (user.Password != currentPasswordEncrypted)
+            return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, _localizer[ValidationMessages.InvalidCurrentPassword]);
+
+        // Update password
+        user.Password = request.NewPassword.EncryptPass();
+        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var userDto = _mapper.Map<UserDto>(updatedUser);
+
+        if (userDto.ImagePath != null)
+            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+
+        return ResultResponse<UserDto>.Ok(userDto);
+    }
+
     public async Task<ResultResponse<UserDto>> GetUserAsyncById(long userId)
     {
         var user = await _userRepository.GetUserAsyncById(userId);

@@ -128,4 +128,19 @@
   <data name="InvalidFileType" xml:space="preserve">
     <value>Formato de archivo no permitido</value>
   </data>
+  <data name="InvalidReferralCode" xml:space="preserve">
+    <value>Código de referido inválido</value>
+  </data>
+  <data name="AlreadyReferred" xml:space="preserve">
+    <value>Usuario ya referido</value>
+  </data>
+  <data name="InvalidCurrentPassword" xml:space="preserve">
+    <value>La contraseña actual es incorrecta</value>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Las contraseñas no coinciden</value>
+  </data>
+  <data name="NewPasswordMustBeDifferent" xml:space="preserve">
+    <value>La nueva contraseña debe ser diferente de la contraseña actual</value>
+  </data>
 </root>
