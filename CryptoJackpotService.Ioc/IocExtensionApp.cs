@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
@@ -20,6 +21,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +41,7 @@ public static class IocExtensionApp
         IWebHostEnvironment environment)
     {
         InjectConfiguration(services, configuration);
+        InjectLocalization(services);
         InjectAuthentication(services, configuration);
         InjectDatabases(services, configuration);
         InjectLogging(services, environment);
@@ -49,6 +52,31 @@ public static class IocExtensionApp
         InjectRepositories(services);
         InjectPackages(services);
         InjectSingletonAndFactories(services);
+    }
+    
+    private static void InjectLocalization(IServiceCollection services)
+    {
+        services.AddLocalization();
+
+        var supportedCultures = new[] { "en", "es" };
+        var localizationOptions = new RequestLocalizationOptions
+        {
+            DefaultRequestCulture = new RequestCulture("en"),
+            SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
+            SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList()
+        };
+
+        // Configurar para usar header Accept-Language
+        localizationOptions.RequestCultureProviders.Clear();
+        localizationOptions.RequestCultureProviders.Add(new AcceptLanguageHeaderRequestCultureProvider());
+
+        services.Configure<RequestLocalizationOptions>(options =>
+        {
+            options.DefaultRequestCulture = localizationOptions.DefaultRequestCulture;
+            options.SupportedCultures = localizationOptions.SupportedCultures;
+            options.SupportedUICultures = localizationOptions.SupportedUICultures;
+            options.RequestCultureProviders = localizationOptions.RequestCultureProviders;
+        });
     }
 
     private static void InjectAuthentication(IServiceCollection services, IConfiguration configuration)

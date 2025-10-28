@@ -1,15 +1,11 @@
-using System.Globalization;
-using Microsoft.AspNetCore.Localization;
 using CryptoJackpotService.Core.Middlewares;
 using CryptoJackpotService.Ioc;
 using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddLocalization();
-
-var envFile = builder.Environment.IsDevelopment() 
-    ? ".env.local" 
+var envFile = builder.Environment.EnvironmentName.Equals("Development", StringComparison.OrdinalIgnoreCase)
+    ? ".env.local"
     : ".env.prod";
 Env.Load(envFile);
 
@@ -19,29 +15,8 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-// culturas soportadas
-var supportedCultures = new[] { "en", "es" };
-var localizationOptions = new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture("en"),
-    SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
-    SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList()
-};
-
-// Configurar para usar header Accept-Language
-localizationOptions.RequestCultureProviders.Clear();
-localizationOptions.RequestCultureProviders.Add(new AcceptLanguageHeaderRequestCultureProvider());
-
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    options.DefaultRequestCulture = localizationOptions.DefaultRequestCulture;
-    options.SupportedCultures = localizationOptions.SupportedCultures;
-    options.SupportedUICultures = localizationOptions.SupportedUICultures;
-    options.RequestCultureProviders = localizationOptions.RequestCultureProviders;
-});
-
 builder.Services.AddHealthChecks();
-builder.Services.IocAppInjectDependencies(builder.Configuration,builder.Environment);
+builder.Services.IocAppInjectDependencies(builder.Configuration, builder.Environment);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
