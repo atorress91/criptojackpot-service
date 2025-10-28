@@ -198,6 +198,7 @@ public static class IocExtensionApp
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IUserReferralRepository, UserReferralRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
     }
 
     private static void InjectServices(IServiceCollection services)
@@ -207,6 +208,7 @@ public static class IocExtensionApp
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<IBrevoService, BrevoService>();
         services.AddScoped<IDigitalOceanStorageService, DigitalOceanStorageService>();
+        services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserReferralService, UserReferralService>();
 
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
