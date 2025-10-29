@@ -33,16 +33,57 @@ public class BrevoService : IBrevoService
         _emailApi = new TransactionalEmailsApi();
     }
 
+    private async Task<ResultResponse<string>> GetEmailTemplateAsync(string templateName)
+    {
+        var templateResult = await _templateProvider.GetTemplateAsync(templateName);
+        return !templateResult.Success
+            ? ResultResponse<string>.Failure(ErrorType.BadRequest, templateResult.Message!)
+            : ResultResponse<string>.Ok(templateResult.Data!);
+    }
+    private static string GetFullName(Dictionary<string, string> data)
+    {
+        return $"{data["name"]} {data["lastName"]}";
+    }
+    private async Task<ResultResponse<string>> SendEmailAsync(
+        string recipientEmail,
+        string subject,
+        string htmlContent,
+        string logSuccessMessage,
+        string logErrorMessage)
+    {
+        try
+        {
+            var email = new SendSmtpEmail
+            {
+                To = [new SendSmtpEmailTo(recipientEmail)],
+                Subject = subject,
+                HtmlContent = htmlContent,
+                Sender = new SendSmtpEmailSender(
+                    _appConfig.BrevoConfiguration.SenderName,
+                    _appConfig.BrevoConfiguration.Email)
+            };
+
+            var result = await _emailApi.SendTransacEmailAsync(email);
+            _logger.LogInformation(logSuccessMessage, result.MessageId);
+            return ResultResponse<string>.Ok(result.MessageId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, logErrorMessage, recipientEmail);
+            return ResultResponse<string>.Failure(ErrorType.Unexpected, ex.Message);
+        }
+    }
+
     public async Task<ResultResponse<string>> SendEmailConfirmationAsync(Dictionary<string, string> data)
     {
-        var templateResult = await _templateProvider.GetTemplateAsync(Constants.ConfirmEmailTemplate);
+        var templateResult = await GetEmailTemplateAsync(Constants.ConfirmEmailTemplate);
         if (!templateResult.Success)
         {
-            return ResultResponse<string>.Failure(ErrorType.BadRequest,templateResult.Message!);
+            return templateResult;
         }
 
         var url = $"{_appConfig.BrevoConfiguration!.BaseUrl}{Constants.UrlConfirmEmail}/{data["token"]}";
-        var fullName = $"{data["name"]} {data["lastName"]}";
+        var fullName = GetFullName(data);
 
         var templateData = new Dictionary<string, string>
         {
@@ -53,36 +94,23 @@ public class BrevoService : IBrevoService
 
         var body = templateResult.Data!.ReplaceHtml(templateData);
 
-        try
-        {
-            var email = new SendSmtpEmail
-            {
-                To = new List<SendSmtpEmailTo> { new(data["user-email"]) },
-                Subject = data["subject"],
-                HtmlContent = body,
-                Sender = new SendSmtpEmailSender(_appConfig.BrevoConfiguration.SenderName, _appConfig.BrevoConfiguration.Email)
-            };
-
-            var result = await _emailApi.SendTransacEmailAsync(email);
-            _logger.LogInformation("Email sent successfully: {MessageId}", result.MessageId);
-            return ResultResponse<string>.Ok(result.MessageId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send email to {Email}", data["user-email"]);
-            return ResultResponse<string>.Failure(ErrorType.Unexpected,ex.Message);
-        }
+        return await SendEmailAsync(
+            recipientEmail: data["user-email"],
+            subject: data["subject"],
+            htmlContent: body,
+            logSuccessMessage: "Email confirmation sent successfully: {MessageId}",
+            logErrorMessage: "Failed to send email confirmation to {Email}");
     }
 
     public async Task<ResultResponse<string>> SendPasswordResetEmailAsync(Dictionary<string, string> data)
     {
-        var templateResult = await _templateProvider.GetTemplateAsync(Constants.PasswordResetTemplate);
+        var templateResult = await GetEmailTemplateAsync(Constants.PasswordResetTemplate);
         if (!templateResult.Success)
         {
-            return ResultResponse<string>.Failure(ErrorType.BadRequest, templateResult.Message!);
+            return templateResult;
         }
 
-        var fullName = $"{data["name"]} {data["lastName"]}";
+        var fullName = GetFullName(data);
 
         var templateData = new Dictionary<string, string>
         {
@@ -93,24 +121,11 @@ public class BrevoService : IBrevoService
 
         var body = templateResult.Data!.ReplaceHtml(templateData);
 
-        try
-        {
-            var email = new SendSmtpEmail
-            {
-                To = new List<SendSmtpEmailTo> { new(data["user-email"]) },
-                Subject = data["subject"],
-                HtmlContent = body,
-                Sender = new SendSmtpEmailSender(_appConfig.BrevoConfiguration.SenderName, _appConfig.BrevoConfiguration.Email)
-            };
-
-            var result = await _emailApi.SendTransacEmailAsync(email);
-            _logger.LogInformation("Password reset email sent successfully: {MessageId}", result.MessageId);
-            return ResultResponse<string>.Ok(result.MessageId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send password reset email to {Email}", data["user-email"]);
-            return ResultResponse<string>.Failure(ErrorType.Unexpected, ex.Message);
-        }
+        return await SendEmailAsync(
+            recipientEmail: data["user-email"],
+            subject: data["subject"],
+            htmlContent: body,
+            logSuccessMessage: "Password reset email sent successfully: {MessageId}",
+            logErrorMessage: "Failed to send password reset email to {Email}");
     }
 }
