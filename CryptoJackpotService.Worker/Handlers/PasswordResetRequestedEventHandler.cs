@@ -1,8 +1,6 @@
-﻿using CryptoJackpotService.Core.Services.IServices;
+﻿﻿using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Messaging.Consumers;
 using CryptoJackpotService.Messaging.Events;
-using CryptoJackpotService.Models.Resources;
-using Microsoft.Extensions.Localization;
 
 namespace CryptoJackpotService.Worker.Handlers;
 
@@ -22,36 +20,19 @@ public class PasswordResetRequestedEventHandler(
 
         // Crear un scope para resolver servicios scoped
         using var scope = serviceScopeFactory.CreateScope();
-        var brevoService = scope.ServiceProvider.GetRequiredService<IBrevoService>();
-        var localizer = scope.ServiceProvider.GetService<IStringLocalizer<ISharedResource>>();
+        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
         try
         {
             // Enviar email de reset de contraseña
-            var emailSubject = localizer?["PasswordResetSubject"] ?? "Password Reset Request";
-
-            var emailData = new Dictionary<string, string>
-            {
-                { "name", @event.Name },
-                { "lastName", @event.LastName },
-                { "securityCode", @event.SecurityCode },
-                { "user-email", @event.Email },
-                { "subject", emailSubject }
-            };
-
             logger.LogInformation("Sending password reset email to {Email}", @event.Email);
-            var emailResult = await brevoService.SendPasswordResetEmailAsync(emailData);
+            
+            await notificationService.SendPasswordResetEmailAsync(
+                @event.Email,
+                @event.Name,
+                @event.LastName,
+                @event.SecurityCode);
 
-            if (!emailResult.Success)
-            {
-                logger.LogWarning(
-                    "Failed to send password reset email for user {UserId}: {Error}",
-                    @event.UserId,
-                    emailResult.Message);
-
-                // Re-lanzar la excepción para que Kafka reintente el procesamiento
-                throw new Exception($"Failed to send password reset email: {emailResult.Message}");
-            }
 
             logger.LogInformation(
                 "Password reset email sent successfully to {Email} for user {UserId}",

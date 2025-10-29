@@ -224,11 +224,12 @@ public static class IocExtensionApp
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICountryService, CountryService>();
-        services.AddScoped<IBrevoService, BrevoService>();
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IDigitalOceanStorageService, DigitalOceanStorageService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserReferralService, UserReferralService>();
 
+        services.AddScoped<IEmailProvider, BrevoProvider>();
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
         services.AddScoped(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
     }

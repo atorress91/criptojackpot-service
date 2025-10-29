@@ -7,14 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CryptoJackpotService.Core.Providers;
 
-public class EmailTemplateProvider : IEmailTemplateProvider
+public class EmailTemplateProvider(ILogger<EmailTemplateProvider> logger) : IEmailTemplateProvider
 {
-    private readonly ILogger<EmailTemplateProvider> _logger;
-
-    public EmailTemplateProvider(ILogger<EmailTemplateProvider> logger)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly ILogger<EmailTemplateProvider> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public async Task<ResultResponse<string>> GetTemplateAsync(string templateName)
     {
