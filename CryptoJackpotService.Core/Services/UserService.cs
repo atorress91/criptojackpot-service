@@ -7,7 +7,6 @@ using CryptoJackpotService.Messaging.Producers;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO.User;
 using CryptoJackpotService.Models.Enums;
-using CryptoJackpotService.Models.Request.Referral;
 using CryptoJackpotService.Models.Request.User;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
@@ -26,7 +25,6 @@ public class UserService : BaseService, IUserService
     private readonly IMapper _mapper;
     private readonly IStringLocalizer<ISharedResource> _localizer;
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
-    private readonly IUserReferralService _userReferralService;
     private readonly IEventProducer? _eventProducer;
     private readonly IConfiguration _configuration;
 
@@ -37,7 +35,6 @@ public class UserService : BaseService, IUserService
         ILogger<UserService> logger,
         IStringLocalizer<ISharedResource> localizer,
         IDigitalOceanStorageService digitalOceanStorageService,
-        IUserReferralService userReferralService,
         IConfiguration configuration,
         IEventProducer? eventProducer = null) : base(mapper)
     {
@@ -47,7 +44,6 @@ public class UserService : BaseService, IUserService
         _logger = logger;
         _localizer = localizer;
         _digitalOceanStorageService = digitalOceanStorageService;
-        _userReferralService = userReferralService;
         _eventProducer = eventProducer;
         _configuration = configuration;
     }

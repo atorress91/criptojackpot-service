@@ -38,7 +38,6 @@ public class UserServiceTests
         var brevoMock = new Mock<IBrevoService>();
         var loggerMock = new Mock<ILogger<UserService>>();
         var localizer = CreateLocalizer();
-        var referralMock = new Mock<IUserReferralService>();
         storageMock ??= new Mock<IDigitalOceanStorageService>();
         var configurationMock = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
 
@@ -49,7 +48,6 @@ public class UserServiceTests
             loggerMock.Object,
             localizer,
             storageMock.Object,
-            referralMock.Object,
             configurationMock.Object,
             null); // EventProducer es opcional
     }
