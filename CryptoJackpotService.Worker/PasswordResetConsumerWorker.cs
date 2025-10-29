@@ -18,7 +18,7 @@ public class PasswordResetConsumerWorker(
     private readonly KafkaSettings _kafkaSettings = kafkaSettings.Value;
     private IConsumer<string, string>? _consumer;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("PasswordResetConsumerWorker starting...");
 
@@ -27,19 +27,21 @@ public class PasswordResetConsumerWorker(
             BootstrapServers = _kafkaSettings.BootstrapServers,
             GroupId = $"{_kafkaSettings.GroupId}-password-reset",
             EnableAutoCommit = _kafkaSettings.EnableAutoCommit,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
+            AutoOffsetReset = AutoOffsetReset.Latest,
             SessionTimeoutMs = _kafkaSettings.SessionTimeoutMs,
             EnableAutoOffsetStore = false
         };
 
         _consumer = new ConsumerBuilder<string, string>(config).Build();
-        _consumer.Subscribe(_kafkaSettings.UserEventsTopic);
+        _consumer.Subscribe(_kafkaSettings.PasswordResetTopic);
 
-        logger.LogInformation("Subscribed to topic: {Topic}", _kafkaSettings.UserEventsTopic);
+        logger.LogInformation("Subscribed to topic: {Topic}", _kafkaSettings.PasswordResetTopic);
 
-        try
+        return Task.Run(async () =>
         {
-            while (!stoppingToken.IsCancellationRequested)
+            try
+            {
+                while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
@@ -54,47 +56,39 @@ public class PasswordResetConsumerWorker(
                         consumeResult.Partition.Value,
                         consumeResult.Offset.Value);
 
-                    // Intentar deserializar como PasswordResetRequestedEvent
-                    try
-                    {
-                        var passwordResetEvent = JsonConvert.DeserializeObject<PasswordResetRequestedEvent>(consumeResult.Message.Value);
+                    var passwordResetEvent = JsonConvert.DeserializeObject<PasswordResetRequestedEvent>(consumeResult.Message.Value);
 
-                        if (passwordResetEvent != null && !string.IsNullOrEmpty(passwordResetEvent.SecurityCode))
-                        {
-                            await ProcessPasswordResetEventAsync(passwordResetEvent, stoppingToken);
-                            _consumer.StoreOffset(consumeResult);
-
-                            logger.LogInformation(
-                                "Successfully processed PasswordResetRequestedEvent for user {UserId}",
-                                passwordResetEvent.UserId);
-                        }
-                    }
-                    catch (JsonSerializationException)
+                    if (passwordResetEvent != null)
                     {
-                        // No es un evento de password reset, simplemente lo ignoramos
+                        await ProcessPasswordResetEventAsync(passwordResetEvent, stoppingToken);
                         _consumer.StoreOffset(consumeResult);
+
+                        logger.LogInformation(
+                            "Successfully processed PasswordResetRequestedEvent for user {UserId}",
+                            passwordResetEvent.UserId);
                     }
                 }
                 catch (ConsumeException ex)
                 {
                     logger.LogError(ex, "Error consuming message from topic {Topic}: {Error}",
-                        _kafkaSettings.UserEventsTopic, ex.Error.Reason);
+                        _kafkaSettings.PasswordResetTopic, ex.Error.Reason);
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Error processing message from topic {Topic}",
-                        _kafkaSettings.UserEventsTopic);
+                        _kafkaSettings.PasswordResetTopic);
                 }
             }
         }
-        catch (OperationCanceledException)
-        {
-            logger.LogInformation("PasswordResetConsumerWorker is shutting down");
-        }
-        finally
-        {
-            _consumer?.Close();
-        }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation("PasswordResetConsumerWorker is shutting down");
+            }
+            finally
+            {
+                _consumer?.Close();
+            }
+        }, stoppingToken);
     }
 
     private async Task ProcessPasswordResetEventAsync(PasswordResetRequestedEvent @event, CancellationToken cancellationToken)

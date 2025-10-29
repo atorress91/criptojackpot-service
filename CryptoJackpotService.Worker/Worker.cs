@@ -27,7 +27,7 @@ public class UserCreatedConsumerWorker : BackgroundService
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("UserCreatedConsumerWorker starting...");
 
@@ -36,19 +36,21 @@ public class UserCreatedConsumerWorker : BackgroundService
             BootstrapServers = _kafkaSettings.BootstrapServers,
             GroupId = _kafkaSettings.GroupId,
             EnableAutoCommit = _kafkaSettings.EnableAutoCommit,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
+            AutoOffsetReset = AutoOffsetReset.Latest,
             SessionTimeoutMs = _kafkaSettings.SessionTimeoutMs,
             EnableAutoOffsetStore = false
         };
 
         _consumer = new ConsumerBuilder<string, string>(config).Build();
-        _consumer.Subscribe(_kafkaSettings.UserEventsTopic);
+        _consumer.Subscribe(_kafkaSettings.UserCreatedTopic);
 
-        _logger.LogInformation("Subscribed to topic: {Topic}", _kafkaSettings.UserEventsTopic);
+        _logger.LogInformation("Subscribed to topic: {Topic}", _kafkaSettings.UserCreatedTopic);
 
-        try
+        return Task.Run(async () =>
         {
-            while (!stoppingToken.IsCancellationRequested)
+            try
+            {
+                while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
@@ -78,23 +80,24 @@ public class UserCreatedConsumerWorker : BackgroundService
                 catch (ConsumeException ex)
                 {
                     _logger.LogError(ex, "Error consuming message from topic {Topic}: {Error}",
-                        _kafkaSettings.UserEventsTopic, ex.Error.Reason);
+                        _kafkaSettings.UserCreatedTopic, ex.Error.Reason);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error processing message from topic {Topic}",
-                        _kafkaSettings.UserEventsTopic);
+                        _kafkaSettings.UserCreatedTopic);
                 }
             }
         }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("UserCreatedConsumerWorker is shutting down");
-        }
-        finally
-        {
-            _consumer?.Close();
-        }
+            catch (OperationCanceledException)
+            {
+                _logger.LogInformation("UserCreatedConsumerWorker is shutting down");
+            }
+            finally
+            {
+                _consumer?.Close();
+            }
+        }, stoppingToken);
     }
 
     private async Task ProcessUserCreatedEventAsync(UserCreatedEvent @event, CancellationToken cancellationToken)

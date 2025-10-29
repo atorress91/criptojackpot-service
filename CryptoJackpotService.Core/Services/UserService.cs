@@ -67,7 +67,7 @@ public class UserService(
                 referralCode: request.ReferralCode
             );
 
-            var topic = configuration.GetValue<string>("Kafka:UserEventsTopic") ?? "user-events";
+            var topic = configuration.GetValue<string>("Kafka:UserCreatedTopic") ?? "user-created-events";
             
             // Fire-and-forget: no esperamos la respuesta
             _ = Task.Run(async () =>
@@ -217,7 +217,7 @@ public class UserService(
                 securityCode: securityCode
             );
 
-            var topic = configuration.GetValue<string>("Kafka:UserEventsTopic") ?? "user-events";
+            var topic = configuration.GetValue<string>("Kafka:PasswordResetTopic") ?? "password-reset-events";
             
             // Fire-and-forget: no esperamos la respuesta
             _ = Task.Run(async () =>

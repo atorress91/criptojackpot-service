@@ -29,12 +29,19 @@ Start-Sleep -Seconds 10
 Write-Host "`n4. Verificando servicios Docker..." -ForegroundColor Yellow
 docker ps --filter "name=kafka" --filter "name=zookeeper" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-# Crear topic si no existe
-Write-Host "`n5. Creando topic 'user-events'..." -ForegroundColor Yellow
-docker exec kafka kafka-topics --create --topic user-events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 --if-not-exists 2>$null
+# Crear topics si no existen
+Write-Host "`n5. Creando topics de Kafka..." -ForegroundColor Yellow
 
+Write-Host "   Creando topic 'user-created-events'..." -ForegroundColor Gray
+docker exec kafka kafka-topics --create --topic user-created-events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 --if-not-exists 2>$null
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✓ Topic 'user-events' creado/verificado" -ForegroundColor Green
+    Write-Host "   ✓ Topic 'user-created-events' creado/verificado" -ForegroundColor Green
+}
+
+Write-Host "   Creando topic 'password-reset-events'..." -ForegroundColor Gray
+docker exec kafka kafka-topics --create --topic password-reset-events --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1 --if-not-exists 2>$null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "   ✓ Topic 'password-reset-events' creado/verificado" -ForegroundColor Green
 }
 
 Write-Host "`n=== Setup Completo ===" -ForegroundColor Green
