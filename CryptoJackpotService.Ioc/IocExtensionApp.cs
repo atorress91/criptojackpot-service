@@ -124,6 +124,8 @@ public static class IocExtensionApp
     private static void InjectDatabases(IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetValue<string>("AppSettings:ConnectionStrings:PostgreSqlConnection");
+        services.AddSingleton<Messaging.Configuration.IEventTopicMapper, 
+            Messaging.Configuration.EventTopicMapper>();
         
         if (string.IsNullOrEmpty(connectionString))
         {

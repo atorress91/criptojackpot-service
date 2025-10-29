@@ -1,6 +1,9 @@
 using CryptoJackpotService.Ioc;
+using CryptoJackpotService.Messaging.Configuration;
+using CryptoJackpotService.Messaging.Events;
 using CryptoJackpotService.Models.Resources;
-using CryptoJackpotService.Worker;
+using CryptoJackpotService.Worker.Extensions;
+using CryptoJackpotService.Worker.Handlers;
 using DotNetEnv;
 using Microsoft.Extensions.Localization;
 
@@ -29,9 +32,13 @@ builder.Services.AddSingleton<IStringLocalizer<ISharedResource>>(sp =>
     return new StringLocalizer<ISharedResource>(factory);
 });
 
-// Registrar los Workers (Consumers de Kafka)
-builder.Services.AddHostedService<UserCreatedConsumerWorker>();
-builder.Services.AddHostedService<PasswordResetConsumerWorker>();
+// Registrar el mapper de eventos a topics
+builder.Services.AddSingleton<IEventTopicMapper, EventTopicMapper>();
+
+// Registrar los Consumers de Kafka usando la nueva arquitectura escalable
+// Para agregar un nuevo consumer, simplemente agrega una línea más:
+builder.Services.AddKafkaConsumer<UserCreatedEvent, UserCreatedEventHandler>();
+builder.Services.AddKafkaConsumer<PasswordResetRequestedEvent, PasswordResetRequestedEventHandler>();
 
 var host = builder.Build();
 await host.RunAsync();

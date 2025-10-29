@@ -42,44 +42,44 @@ public class PasswordResetConsumerWorker(
             try
             {
                 while (!stoppingToken.IsCancellationRequested)
-            {
-                try
                 {
-                    var consumeResult = _consumer.Consume(stoppingToken);
-
-                    if (consumeResult?.Message?.Value == null)
-                        continue;
-
-                    logger.LogInformation(
-                        "Received message from topic {Topic}, partition {Partition}, offset {Offset}",
-                        consumeResult.Topic,
-                        consumeResult.Partition.Value,
-                        consumeResult.Offset.Value);
-
-                    var passwordResetEvent = JsonConvert.DeserializeObject<PasswordResetRequestedEvent>(consumeResult.Message.Value);
-
-                    if (passwordResetEvent != null)
+                    try
                     {
-                        await ProcessPasswordResetEventAsync(passwordResetEvent, stoppingToken);
-                        _consumer.StoreOffset(consumeResult);
+                        var consumeResult = _consumer.Consume(stoppingToken);
+
+                        if (consumeResult?.Message?.Value == null)
+                            continue;
 
                         logger.LogInformation(
-                            "Successfully processed PasswordResetRequestedEvent for user {UserId}",
-                            passwordResetEvent.UserId);
+                            "Received message from topic {Topic}, partition {Partition}, offset {Offset}",
+                            consumeResult.Topic,
+                            consumeResult.Partition.Value,
+                            consumeResult.Offset.Value);
+
+                        var passwordResetEvent = JsonConvert.DeserializeObject<PasswordResetRequestedEvent>(consumeResult.Message.Value);
+
+                        if (passwordResetEvent != null)
+                        {
+                            await ProcessPasswordResetEventAsync(passwordResetEvent, stoppingToken);
+                            _consumer.StoreOffset(consumeResult);
+
+                            logger.LogInformation(
+                                "Successfully processed PasswordResetRequestedEvent for user {UserId}",
+                                passwordResetEvent.UserId);
+                        }
+                    }
+                    catch (ConsumeException ex)
+                    {
+                        logger.LogError(ex, "Error consuming message from topic {Topic}: {Error}",
+                            _kafkaSettings.PasswordResetTopic, ex.Error.Reason);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Error processing message from topic {Topic}",
+                            _kafkaSettings.PasswordResetTopic);
                     }
                 }
-                catch (ConsumeException ex)
-                {
-                    logger.LogError(ex, "Error consuming message from topic {Topic}: {Error}",
-                        _kafkaSettings.PasswordResetTopic, ex.Error.Reason);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Error processing message from topic {Topic}",
-                        _kafkaSettings.PasswordResetTopic);
-                }
             }
-        }
             catch (OperationCanceledException)
             {
                 logger.LogInformation("PasswordResetConsumerWorker is shutting down");
@@ -109,26 +109,36 @@ public class PasswordResetConsumerWorker(
         {
             // Enviar email de reset de contraseña
             var emailSubject = localizer?["PasswordResetSubject"] ?? "Password Reset Request";
-            
+
             var emailData = new Dictionary<string, string>
             {
-                { "name", @event.Name },
-                { "lastName", @event.LastName },
-                { "securityCode", @event.SecurityCode },
-                { "user-email", @event.Email },
-                { "subject", emailSubject }
+                {
+                    "name", @event.Name
+                },
+                {
+                    "lastName", @event.LastName
+                },
+                {
+                    "securityCode", @event.SecurityCode
+                },
+                {
+                    "user-email", @event.Email
+                },
+                {
+                    "subject", emailSubject
+                }
             };
 
             logger.LogInformation("Sending password reset email to {Email}", @event.Email);
             var emailResult = await brevoService.SendPasswordResetEmailAsync(emailData);
-            
+
             if (!emailResult.Success)
             {
                 logger.LogWarning(
                     "Failed to send password reset email for user {UserId}: {Error}",
                     @event.UserId,
                     emailResult.Message);
-                
+
                 // Re-lanzar la excepción para que Kafka reintente el procesamiento
                 throw new Exception($"Failed to send password reset email: {emailResult.Message}");
             }
@@ -147,7 +157,7 @@ public class PasswordResetConsumerWorker(
                 "Error processing PasswordResetRequestedEvent for user {UserId}. Error: {ErrorMessage}",
                 @event.UserId,
                 ex.Message);
-            
+
             // Re-lanzar la excepción para que Kafka reintente el procesamiento
             throw;
         }
@@ -159,4 +169,3 @@ public class PasswordResetConsumerWorker(
         base.Dispose();
     }
 }
-
