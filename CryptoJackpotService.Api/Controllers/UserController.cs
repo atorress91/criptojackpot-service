@@ -67,7 +67,7 @@ public class UserController : ControllerBase
         return result.ToActionResult();
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("get-all-users")]
     public async Task<IActionResult> GetAllUsersAsync([FromQuery] long excludeUserId)
     {

@@ -19,6 +19,7 @@
     <ItemGroup>
         <ProjectReference Include="..\CryptoJackpotService.Core\CryptoJackpotService.Core.csproj" />
         <ProjectReference Include="..\CryptoJackpotService.Ioc\CryptoJackpotService.Ioc.csproj" />
+        <ProjectReference Include="..\CryptoJackpotService.Messaging\CryptoJackpotService.Messaging.csproj" />
     </ItemGroup>
 
 </Project>

@@ -2,6 +2,8 @@
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
+using CryptoJackpotService.Messaging.Events;
+using CryptoJackpotService.Messaging.Producers;
 using CryptoJackpotService.Models.Constants;
 using CryptoJackpotService.Models.DTO.User;
 using CryptoJackpotService.Models.Enums;
@@ -10,6 +12,7 @@ using CryptoJackpotService.Models.Request.User;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
 using CryptoJackpotService.Utility.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -24,6 +27,8 @@ public class UserService : BaseService, IUserService
     private readonly IStringLocalizer<ISharedResource> _localizer;
     private readonly IDigitalOceanStorageService _digitalOceanStorageService;
     private readonly IUserReferralService _userReferralService;
+    private readonly IEventProducer? _eventProducer;
+    private readonly IConfiguration _configuration;
 
     public UserService(
         IMapper mapper,
@@ -32,7 +37,9 @@ public class UserService : BaseService, IUserService
         ILogger<UserService> logger,
         IStringLocalizer<ISharedResource> localizer,
         IDigitalOceanStorageService digitalOceanStorageService,
-        IUserReferralService userReferralService) : base(mapper)
+        IUserReferralService userReferralService,
+        IConfiguration configuration,
+        IEventProducer? eventProducer = null) : base(mapper)
     {
         _mapper = mapper;
         _userRepository = userRepository;
@@ -41,6 +48,8 @@ public class UserService : BaseService, IUserService
         _localizer = localizer;
         _digitalOceanStorageService = digitalOceanStorageService;
         _userReferralService = userReferralService;
+        _eventProducer = eventProducer;
+        _configuration = configuration;
     }
 
     public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
@@ -68,26 +77,61 @@ public class UserService : BaseService, IUserService
 
         user = await _userRepository.CreateUserAsync(user);
 
-        if (referrerUser != null)
+        // Publicar evento de creación de usuario (asíncrono)
+        if (_eventProducer != null)
         {
-            await _userReferralService.CreateUserReferralAsync(new UserReferralRequest
-                { ReferredId = user.Id, ReferrerId = referrerUser.Id, ReferralCode = request.ReferralCode });
-        }
+            var userCreatedEvent = new UserCreatedEvent(
+                userId: user.Id,
+                email: user.Email,
+                name: user.Name,
+                lastName: user.LastName,
+                securityCode: user.SecurityCode!,
+                referrerId: referrerUser?.Id,
+                referralCode: request.ReferralCode
+            );
 
-        var emailData = new Dictionary<string, string>
-        {
-            { "name", user.Name },
-            { "lastName", user.LastName },
-            { "token", user.SecurityCode! },
-            { "user-email", user.Email },
-            { "subject", _localizer["EmailConfirmationSubject"] }
-        };
-
-        var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
-        if (!emailResult.Success)
-        {
-            _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
+            var topic = _configuration.GetValue<string>("Kafka:UserEventsTopic") ?? "user-events";
+            
+            // Fire-and-forget: no esperamos la respuesta
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _eventProducer.PublishAsync(userCreatedEvent, topic);
+                    _logger.LogInformation("UserCreatedEvent published for user {UserId}", user.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to publish UserCreatedEvent for user {UserId}", user.Id);
+                }
+            });
         }
+        // else
+        // {
+        //     // Fallback: Si Kafka no está disponible, enviar email directamente (modo síncrono)
+        //     _logger.LogWarning("Event producer not available, falling back to synchronous email sending");
+        //     
+        //     if (referrerUser != null)
+        //     {
+        //         await _userReferralService.CreateUserReferralAsync(new UserReferralRequest
+        //             { ReferredId = user.Id, ReferrerId = referrerUser.Id, ReferralCode = request.ReferralCode });
+        //     }
+        //
+        //     var emailData = new Dictionary<string, string>
+        //     {
+        //         { "name", user.Name },
+        //         { "lastName", user.LastName },
+        //         { "token", user.SecurityCode! },
+        //         { "user-email", user.Email },
+        //         { "subject", _localizer["EmailConfirmationSubject"] }
+        //     };
+        //
+        //     var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
+        //     if (!emailResult.Success)
+        //     {
+        //         _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
+        //     }
+        // }
 
         var userDto = _mapper.Map<UserDto>(user);
         return ResultResponse<UserDto>.Ok(userDto);

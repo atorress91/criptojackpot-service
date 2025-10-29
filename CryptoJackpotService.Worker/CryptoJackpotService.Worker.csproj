@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-CryptoJackpotService.Worker-7fe7a9de-6a31-47d4-abd4-d284a7cb202b</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CryptoJackpotService.Core\CryptoJackpotService.Core.csproj" />
+    <ProjectReference Include="..\CryptoJackpotService.Data\CryptoJackpotService.Data.csproj" />
+    <ProjectReference Include="..\CryptoJackpotService.Ioc\CryptoJackpotService.Ioc.csproj" />
+    <ProjectReference Include="..\CryptoJackpotService.Messaging\CryptoJackpotService.Messaging.csproj" />
+    <ProjectReference Include="..\CryptoJackpotService.Models\CryptoJackpotService.Models.csproj" />
+  </ItemGroup>
+</Project>

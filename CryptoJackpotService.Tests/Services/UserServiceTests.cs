@@ -40,6 +40,7 @@ public class UserServiceTests
         var localizer = CreateLocalizer();
         var referralMock = new Mock<IUserReferralService>();
         storageMock ??= new Mock<IDigitalOceanStorageService>();
+        var configurationMock = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
 
         return new UserService(
             mapper,
@@ -48,7 +49,9 @@ public class UserServiceTests
             loggerMock.Object,
             localizer,
             storageMock.Object,
-            referralMock.Object);
+            referralMock.Object,
+            configurationMock.Object,
+            null); // EventProducer es opcional
     }
 
     [Fact]

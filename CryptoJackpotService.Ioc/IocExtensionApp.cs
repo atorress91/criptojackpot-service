@@ -52,6 +52,7 @@ public static class IocExtensionApp
         InjectRepositories(services);
         InjectPackages(services);
         InjectSingletonAndFactories(services);
+        InjectMessaging(services, configuration);
     }
     
     private static void InjectLocalization(IServiceCollection services)
@@ -156,6 +157,21 @@ public static class IocExtensionApp
             config.AddNLog($"nlog.{lowerCaseEnvironment}.config");
         });
     }
+    
+    private static void InjectLogging(IServiceCollection services, string environmentName)
+    {
+        var lowerCaseEnvironment = environmentName.ToLower();
+
+        services.AddLogging(config =>
+        {
+            config.ClearProviders();
+            config.AddConsole();
+            config.AddDebug();
+            config.SetMinimumLevel(LogLevel.Debug);
+
+            config.AddNLog($"nlog.{lowerCaseEnvironment}.config");
+        });
+    }
 
     private static void InjectControllersAndDocumentation(IServiceCollection services, int majorVersion = 1,
         int minorVersion = 0)
@@ -214,6 +230,14 @@ public static class IocExtensionApp
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
         services.AddScoped(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
     }
+    
+    private static void InjectMessaging(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<Messaging.Configuration.KafkaSettings>(
+            configuration.GetSection("Kafka"));
+        services.AddSingleton<Messaging.Producers.IEventProducer, 
+            Messaging.Producers.KafkaEventProducer>();
+    }
 
     private static void InjectValidators(IServiceCollection services)
     {
@@ -233,5 +257,27 @@ public static class IocExtensionApp
     {
         services.AddHttpClient();
         services.AddHttpContextAccessor();
+    }
+
+    /// <summary>
+    /// Configura las dependencias para el Worker (Background Service)
+    /// Reutiliza la configuración común y agrega solo lo específico del Worker
+    /// </summary>
+    public static void IocWorkerInjectDependencies(this IServiceCollection services, IConfiguration configuration, string environmentName = "Production")
+    {
+        // Configuración común
+        InjectConfiguration(services, configuration);
+        InjectDatabases(services, configuration);
+        InjectLogging(services, environmentName);
+        InjectRepositories(services);
+        InjectServices(services);
+        InjectPackages(services);
+        InjectMessaging(services, configuration);
+        
+        // Configuración específica del Worker
+        services.AddLocalization(options => options.ResourcesPath = "Resources");
+        
+        // HttpClient (necesario para servicios como BrevoService)
+        services.AddHttpClient();
     }
 }

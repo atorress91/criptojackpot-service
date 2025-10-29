@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -22,6 +22,7 @@
     
     <ItemGroup>
       <ProjectReference Include="..\CryptoJackpotService.Data\CryptoJackpotService.Data.csproj" />
+      <ProjectReference Include="..\CryptoJackpotService.Messaging\CryptoJackpotService.Messaging.csproj" />
       <ProjectReference Include="..\CryptoJackpotService.Models\CryptoJackpotService.Models.csproj" />
       <ProjectReference Include="..\CryptoJackpotService.Utility\CryptoJackpotService.Utility.csproj" />
     </ItemGroup>
