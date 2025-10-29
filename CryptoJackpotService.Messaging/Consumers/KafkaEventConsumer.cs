@@ -11,7 +11,8 @@ public class KafkaEventConsumer<TEvent> : IDisposable where TEvent : class
     private readonly IEventHandler<TEvent> _eventHandler;
     private readonly ILogger<KafkaEventConsumer<TEvent>> _logger;
     private readonly string _topic;
-
+    private bool _disposed;
+    
     public KafkaEventConsumer(
         KafkaSettings kafkaSettings,
         IEventHandler<TEvent> eventHandler,
@@ -80,9 +81,9 @@ public class KafkaEventConsumer<TEvent> : IDisposable where TEvent : class
                 }
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            _logger.LogInformation("Kafka consumer for topic {Topic} is shutting down", _topic);
+            _logger.LogInformation(ex, "Kafka consumer for topic {Topic} is shutting down", _topic);
         }
         finally
         {
@@ -92,7 +93,23 @@ public class KafkaEventConsumer<TEvent> : IDisposable where TEvent : class
 
     public void Dispose()
     {
-        _consumer?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+          
+            _consumer.Close();
+            _consumer.Dispose();
+        }
+
+        _disposed = true;
     }
 }
 

@@ -20,7 +20,6 @@ namespace CryptoJackpotService.Core.Services;
 public class UserService(
     IMapper mapper,
     IUserRepository userRepository,
-    IBrevoService brevoService,
     ILogger<UserService> logger,
     IStringLocalizer<ISharedResource> localizer,
     IDigitalOceanStorageService digitalOceanStorageService,
@@ -207,20 +206,32 @@ public class UserService(
         
         await userRepository.UpdateUserAsync(user);
 
-        var emailData = new Dictionary<string, string>
+        // Publicar evento de reset de contraseña
+        if (eventProducer != null)
         {
-            { "name", user.Name },
-            { "lastName", user.LastName },
-            { "securityCode", securityCode },
-            { "user-email", user.Email },
-            { "subject", localizer["PasswordResetSubject"] }
-        };
+            var passwordResetEvent = new PasswordResetRequestedEvent(
+                userId: user.Id,
+                email: user.Email,
+                name: user.Name,
+                lastName: user.LastName,
+                securityCode: securityCode
+            );
 
-        var emailResult = await brevoService.SendPasswordResetEmailAsync(emailData);
-        if (!emailResult.Success)
-        {
-            logger.LogWarning("Failed to send password reset email: {Error}", emailResult.Message);
-            return ResultResponse<string>.Failure(ErrorType.Unexpected, localizer["FailedToSendEmail"]);
+            var topic = configuration.GetValue<string>("Kafka:UserEventsTopic") ?? "user-events";
+            
+            // Fire-and-forget: no esperamos la respuesta
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await eventProducer.PublishAsync(passwordResetEvent, topic);
+                    logger.LogInformation("PasswordResetRequestedEvent published for user {UserId}", user.Id);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to publish PasswordResetRequestedEvent for user {UserId}", user.Id);
+                }
+            });
         }
 
         return ResultResponse<string>.Ok(localizer[ValidationMessages.PasswordResetEmailSent]);

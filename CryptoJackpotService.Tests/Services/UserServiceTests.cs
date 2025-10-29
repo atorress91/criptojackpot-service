@@ -35,7 +35,6 @@ public class UserServiceTests
         Mock<IDigitalOceanStorageService>? storageMock = null)
     {
         var mapper = CreateMapper();
-        var brevoMock = new Mock<IBrevoService>();
         var loggerMock = new Mock<ILogger<UserService>>();
         var localizer = CreateLocalizer();
         storageMock ??= new Mock<IDigitalOceanStorageService>();
@@ -44,7 +43,6 @@ public class UserServiceTests
         return new UserService(
             mapper,
             userRepoMock.Object,
-            brevoMock.Object,
             loggerMock.Object,
             localizer,
             storageMock.Object,

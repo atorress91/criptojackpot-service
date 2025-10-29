@@ -29,8 +29,9 @@ builder.Services.AddSingleton<IStringLocalizer<ISharedResource>>(sp =>
     return new StringLocalizer<ISharedResource>(factory);
 });
 
-// Registrar el Worker (Consumer de Kafka)
+// Registrar los Workers (Consumers de Kafka)
 builder.Services.AddHostedService<UserCreatedConsumerWorker>();
+builder.Services.AddHostedService<PasswordResetConsumerWorker>();
 
 var host = builder.Build();
 await host.RunAsync();
