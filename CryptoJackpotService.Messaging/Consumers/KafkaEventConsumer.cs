@@ -90,7 +90,6 @@ public class KafkaEventConsumer<TEvent> : IDisposable where TEvent : class
             _consumer.Close();
         }
     }
-
     public void Dispose()
     {
         Dispose(true);
