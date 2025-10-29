@@ -17,52 +17,34 @@ using Microsoft.Extensions.Logging;
 
 namespace CryptoJackpotService.Core.Services;
 
-public class UserService : BaseService, IUserService
+public class UserService(
+    IMapper mapper,
+    IUserRepository userRepository,
+    IBrevoService brevoService,
+    ILogger<UserService> logger,
+    IStringLocalizer<ISharedResource> localizer,
+    IDigitalOceanStorageService digitalOceanStorageService,
+    IConfiguration configuration,
+    IEventProducer? eventProducer = null)
+    : BaseService(mapper), IUserService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IBrevoService _brevoService;
-    private readonly ILogger<UserService> _logger;
-    private readonly IMapper _mapper;
-    private readonly IStringLocalizer<ISharedResource> _localizer;
-    private readonly IDigitalOceanStorageService _digitalOceanStorageService;
-    private readonly IEventProducer? _eventProducer;
-    private readonly IConfiguration _configuration;
-
-    public UserService(
-        IMapper mapper,
-        IUserRepository userRepository,
-        IBrevoService brevoService,
-        ILogger<UserService> logger,
-        IStringLocalizer<ISharedResource> localizer,
-        IDigitalOceanStorageService digitalOceanStorageService,
-        IConfiguration configuration,
-        IEventProducer? eventProducer = null) : base(mapper)
-    {
-        _mapper = mapper;
-        _userRepository = userRepository;
-        _brevoService = brevoService;
-        _logger = logger;
-        _localizer = localizer;
-        _digitalOceanStorageService = digitalOceanStorageService;
-        _eventProducer = eventProducer;
-        _configuration = configuration;
-    }
+    private readonly IMapper _mapper = mapper;
 
     public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
     {
-        var existingUser = await _userRepository.GetUserAsyncByEmail(request.Email);
+        var existingUser = await userRepository.GetUserAsyncByEmail(request.Email);
         if (existingUser != null)
             return ResultResponse<UserDto>.Failure(ErrorType.Conflict,
-                _localizer[ValidationMessages.EmailAlreadyExists]);
+                localizer[ValidationMessages.EmailAlreadyExists]);
 
         User? referrerUser = null;
         if (!string.IsNullOrEmpty(request.ReferralCode))
         {
-            referrerUser = await _userRepository.GetUserBySecurityCodeAsync(request.ReferralCode);
+            referrerUser = await userRepository.GetUserBySecurityCodeAsync(request.ReferralCode);
             if (referrerUser is null)
             {
                 return ResultResponse<UserDto>.Failure(ErrorType.BadRequest,
-                    _localizer[ValidationMessages.InvalidReferralCode]);
+                    localizer[ValidationMessages.InvalidReferralCode]);
             }
         }
 
@@ -71,10 +53,10 @@ public class UserService : BaseService, IUserService
         user.Status = false;
         user.Password = request.Password.EncryptPass();
 
-        user = await _userRepository.CreateUserAsync(user);
+        user = await userRepository.CreateUserAsync(user);
 
-        // Publicar evento de creación de usuario (asíncrono)
-        if (_eventProducer != null)
+        // Publicar evento de creación de usuario
+        if (eventProducer != null)
         {
             var userCreatedEvent = new UserCreatedEvent(
                 userId: user.Id,
@@ -86,93 +68,67 @@ public class UserService : BaseService, IUserService
                 referralCode: request.ReferralCode
             );
 
-            var topic = _configuration.GetValue<string>("Kafka:UserEventsTopic") ?? "user-events";
+            var topic = configuration.GetValue<string>("Kafka:UserEventsTopic") ?? "user-events";
             
             // Fire-and-forget: no esperamos la respuesta
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    await _eventProducer.PublishAsync(userCreatedEvent, topic);
-                    _logger.LogInformation("UserCreatedEvent published for user {UserId}", user.Id);
+                    await eventProducer.PublishAsync(userCreatedEvent, topic);
+                    logger.LogInformation("UserCreatedEvent published for user {UserId}", user.Id);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to publish UserCreatedEvent for user {UserId}", user.Id);
+                    logger.LogError(ex, "Failed to publish UserCreatedEvent for user {UserId}", user.Id);
                 }
             });
         }
-        // else
-        // {
-        //     // Fallback: Si Kafka no está disponible, enviar email directamente (modo síncrono)
-        //     _logger.LogWarning("Event producer not available, falling back to synchronous email sending");
-        //     
-        //     if (referrerUser != null)
-        //     {
-        //         await _userReferralService.CreateUserReferralAsync(new UserReferralRequest
-        //             { ReferredId = user.Id, ReferrerId = referrerUser.Id, ReferralCode = request.ReferralCode });
-        //     }
-        //
-        //     var emailData = new Dictionary<string, string>
-        //     {
-        //         { "name", user.Name },
-        //         { "lastName", user.LastName },
-        //         { "token", user.SecurityCode! },
-        //         { "user-email", user.Email },
-        //         { "subject", _localizer["EmailConfirmationSubject"] }
-        //     };
-        //
-        //     var emailResult = await _brevoService.SendEmailConfirmationAsync(emailData);
-        //     if (!emailResult.Success)
-        //     {
-        //         _logger.LogWarning("Failed to send confirmation email: {Error}", emailResult.Message);
-        //     }
-        // }
-
+        
         var userDto = _mapper.Map<UserDto>(user);
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
     public async Task<ResultResponse<UserDto>> UpdateImageProfile(UpdateImageProfileRequest request)
     {
-        var user = await _userRepository.GetUserAsyncById(request.UserId);
+        var user = await userRepository.GetUserAsyncById(request.UserId);
 
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
 
         user.ImagePath = request.ImageUrl;
-        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var updatedUser = await userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
-            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+            userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
 
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
     public async Task<ResultResponse<UserDto>> GenerateNewSecurityCode(long userId)
     {
-        var user = await _userRepository.GetUserAsyncById(userId);
+        var user = await userRepository.GetUserAsyncById(userId);
 
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
 
         user.SecurityCode = Guid.NewGuid().ToString();
-        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var updatedUser = await userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
-            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+            userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
 
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
     public async Task<ResultResponse<UserDto>> UpdateUserAsync(long userId, UpdateUserRequest request)
     {
-        var user = await _userRepository.GetUserAsyncById(userId);
+        var user = await userRepository.GetUserAsyncById(userId);
 
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
 
         user.Name = request.Name;
         user.LastName = request.LastName;
@@ -181,54 +137,54 @@ public class UserService : BaseService, IUserService
         if (!string.IsNullOrWhiteSpace(request.Password))
             user.Password = request.Password.EncryptPass();
 
-        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var updatedUser = await userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
         
         if (userDto.ImagePath != null)
-            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+            userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
         
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
     public async Task<ResultResponse<UserDto>> UpdatePasswordAsync(UpdatePasswordRequest request)
     {
-        var user = await _userRepository.GetUserAsyncById(request.UserId);
+        var user = await userRepository.GetUserAsyncById(request.UserId);
 
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
         var currentPasswordEncrypted = request.CurrentPassword.EncryptPass();
         if (user.Password != currentPasswordEncrypted)
-            return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, _localizer[ValidationMessages.InvalidCurrentPassword]);
+            return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, localizer[ValidationMessages.InvalidCurrentPassword]);
         
         user.Password = request.NewPassword.EncryptPass();
-        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var updatedUser = await userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
-            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+            userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
 
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
     public async Task<ResultResponse<UserDto>> GetUserAsyncById(long userId)
     {
-        var user = await _userRepository.GetUserAsyncById(userId);
+        var user = await userRepository.GetUserAsyncById(userId);
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
         var userDto = _mapper.Map<UserDto>(user);
         if (userDto.ImagePath != null)
-            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+            userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
         
         return ResultResponse<UserDto>.Ok(userDto);
     }
 
     public async Task<ResultResponse<IEnumerable<UserDto>>> GetAllUsersAsync(long excludeUserId)
     {
-        var users = await _userRepository.GetAllUsersAsync(excludeUserId);
+        var users = await userRepository.GetAllUsersAsync(excludeUserId);
         if(users is null)
-            return ResultResponse<IEnumerable<UserDto>>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<IEnumerable<UserDto>>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
         var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
         var enumerable = userDtos.ToList();
@@ -238,10 +194,10 @@ public class UserService : BaseService, IUserService
 
     public async Task<ResultResponse<string>> RequestPasswordResetAsync(RequestPasswordResetRequest request)
     {
-        var user = await _userRepository.GetUserAsyncByEmail(request.Email);
+        var user = await userRepository.GetUserAsyncByEmail(request.Email);
         
         if (user is null)
-            return ResultResponse<string>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<string>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
         var random = new Random();
         var securityCode = random.Next(100000, 999999).ToString();
@@ -249,7 +205,7 @@ public class UserService : BaseService, IUserService
         user.SecurityCode = securityCode;
         user.PasswordResetCodeExpiration = DateTime.UtcNow.AddMinutes(15);
         
-        await _userRepository.UpdateUserAsync(user);
+        await userRepository.UpdateUserAsync(user);
 
         var emailData = new Dictionary<string, string>
         {
@@ -257,46 +213,46 @@ public class UserService : BaseService, IUserService
             { "lastName", user.LastName },
             { "securityCode", securityCode },
             { "user-email", user.Email },
-            { "subject", _localizer["PasswordResetSubject"] }
+            { "subject", localizer["PasswordResetSubject"] }
         };
 
-        var emailResult = await _brevoService.SendPasswordResetEmailAsync(emailData);
+        var emailResult = await brevoService.SendPasswordResetEmailAsync(emailData);
         if (!emailResult.Success)
         {
-            _logger.LogWarning("Failed to send password reset email: {Error}", emailResult.Message);
-            return ResultResponse<string>.Failure(ErrorType.Unexpected, _localizer["FailedToSendEmail"]);
+            logger.LogWarning("Failed to send password reset email: {Error}", emailResult.Message);
+            return ResultResponse<string>.Failure(ErrorType.Unexpected, localizer["FailedToSendEmail"]);
         }
 
-        return ResultResponse<string>.Ok(_localizer[ValidationMessages.PasswordResetEmailSent]);
+        return ResultResponse<string>.Ok(localizer[ValidationMessages.PasswordResetEmailSent]);
     }
 
     public async Task<ResultResponse<UserDto>> ResetPasswordWithCodeAsync(ResetPasswordWithCodeRequest request)
     {
-        var user = await _userRepository.GetUserAsyncByEmail(request.Email);
+        var user = await userRepository.GetUserAsyncByEmail(request.Email);
         
         if (user is null)
-            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, _localizer[ValidationMessages.UserNotExists]);
+            return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
         if (string.IsNullOrEmpty(user.SecurityCode) || 
             user.SecurityCode != request.SecurityCode ||
             user.PasswordResetCodeExpiration == null || 
             user.PasswordResetCodeExpiration < DateTime.UtcNow)
             return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, 
-                _localizer[ValidationMessages.InvalidOrExpiredSecurityCode]);
+                localizer[ValidationMessages.InvalidOrExpiredSecurityCode]);
 
         if (request.NewPassword != request.ConfirmPassword)
             return ResultResponse<UserDto>.Failure(ErrorType.BadRequest, 
-                _localizer[ValidationMessages.PasswordsDoNotMatch]);
+                localizer[ValidationMessages.PasswordsDoNotMatch]);
         
         user.Password = request.NewPassword.EncryptPass();
         user.SecurityCode = null;
         user.PasswordResetCodeExpiration = null;
 
-        var updatedUser = await _userRepository.UpdateUserAsync(user);
+        var updatedUser = await userRepository.UpdateUserAsync(user);
         var userDto = _mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
-            userDto.ImagePath = _digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
+            userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
 
         return ResultResponse<UserDto>.Ok(userDto);
     }
