@@ -1,4 +1,4 @@
-﻿﻿using CryptoJackpotService.Core.Services.IServices;
+﻿using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Messaging.Consumers;
 using CryptoJackpotService.Messaging.Events;
 

@@ -2,6 +2,7 @@
 using CryptoJackpotService.Core.Services.IServices;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Constants;
+using CryptoJackpotService.Models.Exceptions;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Utility.Extensions;
 using Microsoft.Extensions.Localization;
@@ -31,7 +32,7 @@ public class NotificationService(
         if (!templateResult.Success)
         {
             logger.LogError("Template not found: {Message}", templateResult.Message);
-            throw new Exception($"Template not found: {templateResult.Message}");
+            throw new NotFoundException($"Template not found: {templateResult.Message}");
         }
 
         var url = $"{_appConfig.BrevoConfiguration!.BaseUrl}{Constants.UrlConfirmEmail}/{token}";
@@ -52,7 +53,7 @@ public class NotificationService(
         if (!result.Success)
         {
             logger.LogWarning("Failed to send confirmation email for user {UserId}: {Message}", userId, result.Message);
-            throw new Exception($"Failed to send email: {result.Message}");
+            throw new BadRequestException($"Failed to send email: {result.Message}");
         }
 
         logger.LogInformation("Email confirmation sent successfully for user {UserId}", userId);
@@ -68,7 +69,7 @@ public class NotificationService(
         if (!templateResult.Success)
         {
             logger.LogError("Template not found: {Message}", templateResult.Message);
-            throw new Exception($"Template not found: {templateResult.Message}");
+            throw new NotFoundException($"Template not found: {templateResult.Message}");
         }
 
         var fullName = $"{name} {lastName}";
@@ -88,7 +89,7 @@ public class NotificationService(
         if (!result.Success)
         {
             logger.LogWarning("Failed to send password reset email to {Email}: {Message}", email, result.Message);
-            throw new Exception($"Failed to send email: {result.Message}");
+            throw new BadRequestException($"Failed to send email: {result.Message}");
         }
 
         logger.LogInformation("Password reset email sent successfully to {Email}", email);
@@ -106,7 +107,7 @@ public class NotificationService(
         if (!templateResult.Success)
         {
             logger.LogError("Template not found: {Message}", templateResult.Message);
-            throw new Exception($"Template not found: {templateResult.Message}");
+            throw new NotFoundException($"Template not found: {templateResult.Message}");
         }
 
         var referrerFullName = $"{referrerName} {referrerLastName}";
@@ -130,7 +131,7 @@ public class NotificationService(
         if (!result.Success)
         {
             logger.LogWarning("Failed to send referral notification to {Email}: {Message}", referrerEmail, result.Message);
-            throw new Exception($"Failed to send referral notification: {result.Message}");
+            throw new BadRequestException($"Failed to send referral notification: {result.Message}");
         }
 
         logger.LogInformation("Referral notification sent successfully to {Email}", referrerEmail);
