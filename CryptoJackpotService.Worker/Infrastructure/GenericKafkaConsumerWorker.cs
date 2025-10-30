@@ -97,9 +97,10 @@ public class GenericKafkaConsumerWorker<TEvent>(
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
                 logger.LogInformation(
+                    ex,
                     "{ConsumerName} is shutting down",
                     typeof(TEvent).Name);
             }
