@@ -14,4 +14,12 @@ public interface INotificationService
         string name,
         string lastName,
         string securityCode);
+
+    Task SendReferralNotificationAsync(
+        string referrerEmail,
+        string referrerName,
+        string referrerLastName,
+        string referredName,
+        string referredLastName,
+        string referralCode);
 }

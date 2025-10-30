@@ -93,5 +93,47 @@ public class NotificationService(
 
         logger.LogInformation("Password reset email sent successfully to {Email}", email);
     }
+
+    public async Task SendReferralNotificationAsync(
+        string referrerEmail,
+        string referrerName,
+        string referrerLastName,
+        string referredName,
+        string referredLastName,
+        string referralCode)
+    {
+        var templateResult = await templateProvider.GetTemplateAsync(Constants.ReferralNotificationTemplate);
+        if (!templateResult.Success)
+        {
+            logger.LogError("Template not found: {Message}", templateResult.Message);
+            throw new Exception($"Template not found: {templateResult.Message}");
+        }
+
+        var referrerFullName = $"{referrerName} {referrerLastName}";
+        var referredFullName = $"{referredName} {referredLastName}";
+        var subject = localizer["ReferralNotificationSubject"];
+        var referralsUrl = $"{_appConfig.BrevoConfiguration!.BaseUrl}/my-referrals";
+
+        var templateData = new Dictionary<string, string>
+        {
+            ["{0}"] = referrerFullName,
+            ["{1}"] = referredFullName,
+            ["{2}"] = referralCode,
+            ["{3}"] = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss"),
+            ["{4}"] = referralsUrl
+        };
+
+        var body = templateResult.Data!.ReplaceHtml(templateData);
+
+        var result = await emailProvider.SendEmailAsync(referrerEmail, subject, body);
+
+        if (!result.Success)
+        {
+            logger.LogWarning("Failed to send referral notification to {Email}: {Message}", referrerEmail, result.Message);
+            throw new Exception($"Failed to send referral notification: {result.Message}");
+        }
+
+        logger.LogInformation("Referral notification sent successfully to {Email}", referrerEmail);
+    }
 }
 

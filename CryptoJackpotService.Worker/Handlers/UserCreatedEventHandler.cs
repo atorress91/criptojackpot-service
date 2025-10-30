@@ -61,6 +61,35 @@ public class UserCreatedEventHandler(
                     "Referral created successfully for user {UserId} by referrer {ReferrerId}",
                     @event.UserId,
                     @event.ReferrerId.Value);
+
+                // 3. Notificar al referrer por email
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                var referrerResult = await userService.GetUserAsyncById(@event.ReferrerId.Value);
+                
+                if (referrerResult.Success && referrerResult.Data != null)
+                {
+                    logger.LogInformation(
+                        "Sending referral notification to referrer {ReferrerId}",
+                        @event.ReferrerId.Value);
+
+                    await notificationService.SendReferralNotificationAsync(
+                        referrerResult.Data.Email,
+                        referrerResult.Data.Name,
+                        referrerResult.Data.LastName,
+                        @event.Name,
+                        @event.LastName,
+                        @event.ReferralCode);
+
+                    logger.LogInformation(
+                        "Referral notification sent successfully to referrer {ReferrerId}",
+                        @event.ReferrerId.Value);
+                }
+                else
+                {
+                    logger.LogWarning(
+                        "Could not send referral notification: Referrer {ReferrerId} not found",
+                        @event.ReferrerId.Value);
+                }
             }
             else
             {
