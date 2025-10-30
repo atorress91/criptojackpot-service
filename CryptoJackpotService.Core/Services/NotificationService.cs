@@ -112,7 +112,7 @@ public class NotificationService(
         var referrerFullName = $"{referrerName} {referrerLastName}";
         var referredFullName = $"{referredName} {referredLastName}";
         var subject = localizer["ReferralNotificationSubject"];
-        var referralsUrl = $"{_appConfig.BrevoConfiguration!.BaseUrl}/my-referrals";
+        var referralsUrl = $"{_appConfig.BrevoConfiguration!.BaseUrl}/referal-program";
 
         var templateData = new Dictionary<string, string>
         {
