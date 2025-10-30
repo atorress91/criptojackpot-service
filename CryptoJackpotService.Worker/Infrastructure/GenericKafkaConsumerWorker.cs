@@ -48,67 +48,7 @@ public class GenericKafkaConsumerWorker<TEvent>(
             topic,
             config.GroupId);
 
-        return Task.Run(async () =>
-        {
-            try
-            {
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    try
-                    {
-                        var consumeResult = _consumer.Consume(stoppingToken);
-
-                        if (consumeResult?.Message?.Value == null)
-                            continue;
-
-                        logger.LogInformation(
-                            "Received message from topic {Topic}, partition {Partition}, offset {Offset}",
-                            consumeResult.Topic,
-                            consumeResult.Partition.Value,
-                            consumeResult.Offset.Value);
-
-                        var @event = JsonConvert.DeserializeObject<TEvent>(consumeResult.Message.Value);
-
-                        if (@event != null)
-                        {
-                            await ProcessEventAsync(@event, stoppingToken);
-                            _consumer.StoreOffset(consumeResult);
-
-                            logger.LogInformation(
-                                "Successfully processed {EventType} from offset {Offset}",
-                                typeof(TEvent).Name,
-                                consumeResult.Offset.Value);
-                        }
-                    }
-                    catch (ConsumeException ex)
-                    {
-                        logger.LogError(
-                            ex,
-                            "Error consuming message from topic {Topic}: {Error}",
-                            topic,
-                            ex.Error.Reason);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(
-                            ex,
-                            "Error processing message from topic {Topic}",
-                            topic);
-                    }
-                }
-            }
-            catch (OperationCanceledException ex)
-            {
-                logger.LogInformation(
-                    ex,
-                    "{ConsumerName} is shutting down",
-                    typeof(TEvent).Name);
-            }
-            finally
-            {
-                _consumer?.Close();
-            }
-        }, stoppingToken);
+        return RunConsumerLoopAsync(stoppingToken);
     }
 
     private async Task ProcessEventAsync(TEvent @event, CancellationToken cancellationToken)
@@ -128,6 +68,74 @@ public class GenericKafkaConsumerWorker<TEvent>(
         await handler.HandleAsync(@event, cancellationToken);
     }
 
+    private async Task RunConsumerLoopAsync(CancellationToken stoppingToken)
+    {
+        if (_consumer == null)
+        {
+            logger.LogError("Consumer is not initialized");
+            return;
+        }
+
+        try
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var consumeResult = _consumer.Consume(stoppingToken);
+
+                    if (consumeResult?.Message?.Value == null)
+                        continue;
+
+                    logger.LogInformation(
+                        "Received message from topic {Topic}, partition {Partition}, offset {Offset}",
+                        consumeResult.Topic,
+                        consumeResult.Partition.Value,
+                        consumeResult.Offset.Value);
+
+                    var @event = JsonConvert.DeserializeObject<TEvent>(consumeResult.Message.Value);
+
+                    if (@event != null)
+                    {
+                        await ProcessEventAsync(@event, stoppingToken);
+                        _consumer.StoreOffset(consumeResult);
+
+                        logger.LogInformation(
+                            "Successfully processed {EventType} from offset {Offset}",
+                            typeof(TEvent).Name,
+                            consumeResult.Offset.Value);
+                    }
+                }
+                catch (ConsumeException ex)
+                {
+                    logger.LogError(
+                        ex,
+                        "Error consuming message from topic {Topic}: {Error}",
+                        topic,
+                        ex.Error.Reason);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(
+                        ex,
+                        "Error processing message from topic {Topic}",
+                        topic);
+                }
+            }
+        }
+        catch (OperationCanceledException ex)
+        {
+            logger.LogInformation(
+                ex,
+                "{ConsumerName} is shutting down",
+                typeof(TEvent).Name);
+        }
+        finally
+        {
+            _consumer?.Close();
+        }
+    }
+
     public override void Dispose()
     {
         _consumer?.Dispose();
@@ -135,4 +143,3 @@ public class GenericKafkaConsumerWorker<TEvent>(
         GC.SuppressFinalize(this);
     }
 }
-
