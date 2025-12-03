@@ -1,0 +1,31 @@
+﻿# Git
+.git
+.gitignore
+
+# IDE / Editor
+.vs/
+.vscode/
+*.suo
+*.user
+_ReSharper.Caches/
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Environment files (secretos)
+.env
+.env.*
+!.env.example
+
+# Test projects
+**/CryptoJackpotService.Tests/
+
+# Documentation
+*.md
+LICENSE
+
+# Misc
+*.log
+*.db
+

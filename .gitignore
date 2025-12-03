@@ -14,7 +14,13 @@ _ReSharper.Caches/
 # User-specific files
 *.suo
 *.user
-.env*
+
+# Environment variables (secretos)
+.env
+.env.local
+.env.prod
+.env.production
+!.env.example
 # DB / cache files
 *.db
 *.db-shm
