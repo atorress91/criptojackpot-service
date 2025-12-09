@@ -126,6 +126,31 @@ public static class IocExtensionApp
                 Title = "CryptoJackpotService",
                 Version = "v1"
             });
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Ingresa el token JWT en el formato: {token}"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
         });
 
     private static void InjectDatabases(IServiceCollection services, IConfiguration configuration)
@@ -142,6 +167,7 @@ public static class IocExtensionApp
         }
 
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
 
         services.AddDbContext<CryptoJackpotDbContext>(options =>

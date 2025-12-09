@@ -4,7 +4,7 @@ namespace CryptoJackpotService.Models.Request.Prize;
 
 public class CreatePrizeRequest
 {
-    public Guid LotteryId { get; set; }
+    public Guid? LotteryId { get; set; }
     public int Tier { get; set; }
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;

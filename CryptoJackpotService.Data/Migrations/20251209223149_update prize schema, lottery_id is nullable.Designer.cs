@@ -5,6 +5,7 @@ using CryptoJackpotService.Data.Database;
 using CryptoJackpotService.Data.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CryptoJackpotService.Data.Migrations
 {
     [DbContext(typeof(CryptoJackpotDbContext))]
-    partial class CryptoJackpotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251209223149_update prize schema, lottery_id is nullable")]
+    partial class updateprizeschemalottery_idisnullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -10,7 +10,7 @@ public class PrizeConfiguration : IEntityTypeConfiguration<Prize>
     public void Configure(EntityTypeBuilder<Prize> builder)
     {
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.LotteryId).IsRequired();
+        builder.Property(e => e.LotteryId).IsRequired(false);
         builder.Property(e => e.Tier).IsRequired();
         builder.Property(e => e.Name).IsRequired().HasColumnType(ColumnTypes.Text).HasMaxLength(200);
         builder.Property(e => e.Description).IsRequired().HasColumnType(ColumnTypes.Text).HasMaxLength(500);
