@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-CryptoJackpotService.Worker-7fe7a9de-6a31-47d4-abd4-d284a7cb202b</UserSecretsId>
+    <UserSecretsId>050ed5d0-f900-4905-a72e-8bdd7ec83c11</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

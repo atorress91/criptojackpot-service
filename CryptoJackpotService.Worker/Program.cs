@@ -8,12 +8,18 @@ using Microsoft.Extensions.Localization;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Configuración nativa de .NET:
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables();
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+// Agregar User Secrets en Development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
+builder.Configuration.AddEnvironmentVariables();
 
 // Inyectar todas las dependencias usando el método de extensión centralizado
 builder.Services.IocWorkerInjectDependencies(builder.Configuration, builder.Environment.EnvironmentName);
