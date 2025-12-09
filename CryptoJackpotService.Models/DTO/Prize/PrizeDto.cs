@@ -1,9 +1,8 @@
 ﻿using CryptoJackpotService.Models.Enums;
 
-namespace CryptoJackpotService.Data.Database.Models;
+namespace CryptoJackpotService.Models.DTO.Prize;
 
-/*Premios*/
-public class Prize : BaseEntity
+public class PrizeDto
 {
     public Guid Id { get; set; }
     public Guid LotteryId { get; set; }
@@ -13,16 +12,14 @@ public class Prize : BaseEntity
     public decimal EstimatedValue { get; set; }
     public PrizeType Type { get; set; }
     public string MainImageUrl { get; set; } = null!;
-    public List<PrizeImage> AdditionalImages { get; set; } = null!;
-    public Dictionary<string, string> Specifications { get; set; } = null!;
+    public List<PrizeImageDto> AdditionalImages { get; set; } = new();
+    public Dictionary<string, string> Specifications { get; set; } = new();
     public decimal? CashAlternative { get; set; }
     public bool IsDeliverable { get; set; }
     public bool IsDigital { get; set; }
-    
-    // Ganador cuando se determine
     public Guid? WinnerTicketId { get; set; }
     public DateTime? ClaimedAt { get; set; }
-
-    public virtual Lottery Lottery { get; set; } = null!;
-    public virtual Ticket? WinnerTicket { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
+

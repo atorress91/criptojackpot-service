@@ -54,12 +54,15 @@ public static class IocExtensionApp
         InjectSingletonAndFactories(services);
         InjectMessaging(services, configuration);
     }
-    
+
     private static void InjectLocalization(IServiceCollection services)
     {
         services.AddLocalization();
 
-        var supportedCultures = new[] { "en", "es" };
+        var supportedCultures = new[]
+        {
+            "en", "es"
+        };
         var localizationOptions = new RequestLocalizationOptions
         {
             DefaultRequestCulture = new RequestCulture("en"),
@@ -118,15 +121,19 @@ public static class IocExtensionApp
     private static void InjectSwagger(IServiceCollection services)
         => services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "CryptoJackpotService", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "CryptoJackpotService",
+                Version = "v1"
+            });
         });
 
     private static void InjectDatabases(IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetValue<string>("AppSettings:ConnectionStrings:PostgreSqlConnection");
-        services.AddSingleton<Messaging.Configuration.IEventTopicMapper, 
+        services.AddSingleton<Messaging.Configuration.IEventTopicMapper,
             Messaging.Configuration.EventTopicMapper>();
-        
+
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException(
@@ -159,7 +166,7 @@ public static class IocExtensionApp
             config.AddNLog($"nlog.{lowerCaseEnvironment}.config");
         });
     }
-    
+
     private static void InjectLogging(IServiceCollection services, string environmentName)
     {
         var lowerCaseEnvironment = environmentName.ToLower();
@@ -217,6 +224,7 @@ public static class IocExtensionApp
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IUserReferralRepository, UserReferralRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPrizeRepository, PrizeRepository>();
     }
 
     private static void InjectServices(IServiceCollection services)
@@ -228,17 +236,18 @@ public static class IocExtensionApp
         services.AddScoped<IDigitalOceanStorageService, DigitalOceanStorageService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserReferralService, UserReferralService>();
+        services.AddScoped<IPrizeService, PrizeService>();
 
         services.AddScoped<IEmailProvider, BrevoProvider>();
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
         services.AddScoped(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
     }
-    
+
     private static void InjectMessaging(IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<Messaging.Configuration.KafkaSettings>(
             configuration.GetSection("Kafka"));
-        services.AddSingleton<Messaging.Producers.IEventProducer, 
+        services.AddSingleton<Messaging.Producers.IEventProducer,
             Messaging.Producers.KafkaEventProducer>();
     }
 
@@ -276,10 +285,10 @@ public static class IocExtensionApp
         InjectServices(services);
         InjectPackages(services);
         InjectMessaging(services, configuration);
-        
+
         // Configuración específica del Worker
         services.AddLocalization(options => options.ResourcesPath = "Resources");
-        
+
         // HttpClient (necesario para servicios como BrevoService)
         services.AddHttpClient();
     }

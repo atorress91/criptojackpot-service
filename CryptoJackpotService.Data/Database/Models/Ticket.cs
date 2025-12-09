@@ -15,8 +15,10 @@ public class Ticket : BaseEntity
     public long? GiftRecipientId { get; set; }
 
     public virtual ICollection<LotteryNumber> SelectedNumbers { get; set; } = null!;
-    
+
     public virtual Lottery Lottery { get; set; } = null!;
     public virtual User User { get; set; } = null!;
-    public virtual User? GiftRecipient { get; set; } 
+    public virtual User? GiftRecipient { get; set; }
+
+    public virtual ICollection<Prize> WonPrizes { get; set; } = null!;
 }

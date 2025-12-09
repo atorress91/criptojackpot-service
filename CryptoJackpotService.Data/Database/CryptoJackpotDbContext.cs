@@ -14,7 +14,6 @@ public class CryptoJackpotDbContext(DbContextOptions<CryptoJackpotDbContext> opt
     public DbSet<LotteryNumber> LotteryNumbers { get; set; } = null!;
     public DbSet<Prize> Prizes { get; set; } = null!;
     public DbSet<PrizeImage> PrizeImages { get; set; } = null!;
-    public DbSet<PrizeTier> PrizeTiers { get; set; } = null!;
     public DbSet<Ticket> Tickets { get; set; } = null!;
     public DbSet<Winner> Winners { get; set; } = null!;
     public DbSet<Invoice> Invoices { get; set; } = null!;

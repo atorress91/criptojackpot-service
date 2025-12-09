@@ -25,6 +25,8 @@ public class Lottery : BaseEntity
     public int? MinimumAge { get; set; }
     
     public List<string> RestrictedCountries { get; set; } = null!;
-    public List<PrizeTier> PrizeTiers { get; set; } = null!; // Múltiples niveles de premios
+   
     public virtual ICollection<Ticket> Tickets { get; set; } = null!;
+    public virtual ICollection<Prize> Prizes { get; set; } = null!;
+    public virtual ICollection<LotteryNumber> LotteryNumbers { get; set; } = null!;
 }

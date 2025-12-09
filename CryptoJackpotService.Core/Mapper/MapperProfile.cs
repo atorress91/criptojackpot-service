@@ -2,9 +2,11 @@
 using CryptoJackpotService.Data.Database.Custom;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Models.DTO.Country;
+using CryptoJackpotService.Models.DTO.Prize;
 using CryptoJackpotService.Models.DTO.Role;
 using CryptoJackpotService.Models.DTO.User;
 using CryptoJackpotService.Models.DTO.UserReferral;
+using CryptoJackpotService.Models.Request.Prize;
 using CryptoJackpotService.Models.Request.Referral;
 using CryptoJackpotService.Models.Request.User;
 
@@ -35,8 +37,12 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.LastMonthEarnings, 
                 opt => opt.MapFrom(src => src.Count(r => r.RegisterDate >= DateTime.Now.AddMonths(-1)) * 10))
             .ForMember(dest => dest.Referrals, 
-                opt => opt.MapFrom(src => src)); 
+                opt => opt.MapFrom(src => src));
 
-
+        // Prize mappings
+        CreateMap<CreatePrizeRequest, Prize>();
+        CreateMap<PrizeImageRequest, PrizeImage>();
+        CreateMap<Prize, PrizeDto>();
+        CreateMap<PrizeImage, PrizeImageDto>();
     }
 }

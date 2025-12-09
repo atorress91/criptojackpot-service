@@ -8,7 +8,7 @@ public class Winner : BaseEntity
     public Guid LotteryId { get; set; }
     public Guid TicketId { get; set; }
     public long UserId { get; set; }
-    public Guid PrizeTierId { get; set; }
+    public Guid PrizeId { get; set; }
     public WinnerStatus Status { get; set; }
     public DateTime WinDate { get; set; }
     public DateTime? ClaimDate { get; set; }
@@ -19,5 +19,5 @@ public class Winner : BaseEntity
     public virtual Lottery Lottery { get; set; } = null!;
     public virtual Ticket Ticket { get; set; } = null!;
     public virtual User User { get; set; } = null!;
-    public virtual PrizeTier PrizeTier { get; set; } = null!;
+    public virtual Prize Prize { get; set; } = null!;
 }

@@ -32,12 +32,17 @@ public class LotteryConfiguration : IEntityTypeConfiguration<Lottery>
 
         builder.HasIndex(e => e.LotteryNo).IsUnique();
         
-        builder.HasMany(e => e.PrizeTiers)
+        builder.HasMany(e => e.Prizes)
             .WithOne(e => e.Lottery)
             .HasForeignKey(e => e.LotteryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(e => e.Tickets)
+            .WithOne(e => e.Lottery)
+            .HasForeignKey(e => e.LotteryId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(e => e.LotteryNumbers)
             .WithOne(e => e.Lottery)
             .HasForeignKey(e => e.LotteryId)
             .OnDelete(DeleteBehavior.Cascade);
