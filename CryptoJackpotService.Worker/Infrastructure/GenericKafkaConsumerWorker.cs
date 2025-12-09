@@ -142,71 +142,7 @@ public class GenericKafkaConsumerWorker<TEvent>(
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
-                {
-                    var consumeResult = _consumer.Consume(stoppingToken);
-
-                    if (consumeResult?.Message?.Value == null)
-                        continue;
-
-                    logger.LogInformation(
-                        "Received message from topic {Topic}, partition {Partition}, offset {Offset}",
-                        consumeResult.Topic,
-                        consumeResult.Partition.Value,
-                        consumeResult.Offset.Value);
-
-                    // Deserialización robusta con configuración tolerante
-                    var @event = JsonConvert.DeserializeObject<TEvent>(consumeResult.Message.Value, KafkaJsonSettings.Settings);
-
-                    if (@event == null)
-                    {
-                        logger.LogWarning(
-                            "Failed to deserialize message from offset {Offset}, skipping...",
-                            consumeResult.Offset.Value);
-                        _consumer.StoreOffset(consumeResult); // Evitar reprocesamiento infinito
-                        continue;
-                    }
-
-                    // Procesar con retry policy
-                    var success = await ProcessEventWithRetryAsync(@event, stoppingToken);
-                    
-                    // Siempre guardamos el offset para evitar reprocesamiento infinito
-                    // (los reintentos ya se manejaron con Polly)
-                    _consumer.StoreOffset(consumeResult);
-
-                    if (success)
-                    {
-                        LastSuccessfulProcessing = DateTime.UtcNow;
-                        IsHealthy = true;
-                        
-                        logger.LogInformation(
-                            "Successfully processed {EventType} from offset {Offset}",
-                            typeof(TEvent).Name,
-                            consumeResult.Offset.Value);
-                    }
-                    else
-                    {
-                        logger.LogWarning(
-                            "Message from offset {Offset} was skipped after all retries failed",
-                            consumeResult.Offset.Value);
-                    }
-                }
-                catch (ConsumeException ex)
-                {
-                    IsHealthy = false;
-                    logger.LogError(
-                        ex,
-                        "Error consuming message from topic {Topic}: {Error}",
-                        topic,
-                        ex.Error.Reason);
-                }
-                catch (Exception ex) when (ex is not OperationCanceledException)
-                {
-                    logger.LogError(
-                        ex,
-                        "Unexpected error processing message from topic {Topic}",
-                        topic);
-                }
+                await ConsumeAndProcessMessageAsync(stoppingToken);
             }
         }
         catch (OperationCanceledException ex)
@@ -220,6 +156,94 @@ public class GenericKafkaConsumerWorker<TEvent>(
         {
             _consumer?.Close();
         }
+    }
+
+    private async Task ConsumeAndProcessMessageAsync(CancellationToken stoppingToken)
+    {
+        try
+        {
+            var consumeResult = _consumer!.Consume(stoppingToken);
+
+            if (consumeResult?.Message?.Value == null)
+                return;
+
+            logger.LogInformation(
+                "Received message from topic {Topic}, partition {Partition}, offset {Offset}",
+                consumeResult.Topic,
+                consumeResult.Partition.Value,
+                consumeResult.Offset.Value);
+
+            await ProcessConsumedMessageAsync(consumeResult, stoppingToken);
+        }
+        catch (ConsumeException ex)
+        {
+            await HandleConsumeExceptionAsync(ex, stoppingToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error processing message from topic {Topic}",
+                topic);
+        }
+    }
+
+    private async Task ProcessConsumedMessageAsync(ConsumeResult<string, string> consumeResult, CancellationToken stoppingToken)
+    {
+        var @event = JsonConvert.DeserializeObject<TEvent>(consumeResult.Message.Value, KafkaJsonSettings.Settings);
+
+        if (@event == null)
+        {
+            logger.LogWarning(
+                "Failed to deserialize message from offset {Offset}, skipping...",
+                consumeResult.Offset.Value);
+            _consumer!.StoreOffset(consumeResult);
+            return;
+        }
+
+        var success = await ProcessEventWithRetryAsync(@event, stoppingToken);
+        _consumer!.StoreOffset(consumeResult);
+
+        LogProcessingResult(success, consumeResult.Offset.Value);
+    }
+
+    private void LogProcessingResult(bool success, long offset)
+    {
+        if (success)
+        {
+            LastSuccessfulProcessing = DateTime.UtcNow;
+            IsHealthy = true;
+            
+            logger.LogInformation(
+                "Successfully processed {EventType} from offset {Offset}",
+                typeof(TEvent).Name,
+                offset);
+        }
+        else
+        {
+            logger.LogWarning(
+                "Message from offset {Offset} was skipped after all retries failed",
+                offset);
+        }
+    }
+
+    private async Task HandleConsumeExceptionAsync(ConsumeException ex, CancellationToken stoppingToken)
+    {
+        if (ex.Error.Code == ErrorCode.UnknownTopicOrPart)
+        {
+            logger.LogWarning(
+                "Topic {Topic} does not exist yet. Waiting 5 seconds before retry... (Topic will be auto-created when first message is produced)",
+                topic);
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            return;
+        }
+        
+        IsHealthy = false;
+        logger.LogError(
+            ex,
+            "Error consuming message from topic {Topic}: {Error}",
+            topic,
+            ex.Error.Reason);
     }
 
     /// <summary>

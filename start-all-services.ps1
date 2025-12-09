@@ -11,7 +11,7 @@ Write-Host ""
 # =============================================================================
 # 1. Verificar Docker
 # =============================================================================
-Write-Host "🔍 [1/5] Verificando Docker..." -ForegroundColor Yellow
+Write-Host "🔍 [1/6] Verificando Docker..." -ForegroundColor Yellow
 docker --version 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ ERROR: Docker no está instalado o no está corriendo" -ForegroundColor Red
@@ -24,7 +24,7 @@ Write-Host "✅ Docker está disponible" -ForegroundColor Green
 # 2. Detener contenedores existentes (si hay)
 # =============================================================================
 Write-Host ""
-Write-Host "🛑 [2/5] Limpiando contenedores existentes..." -ForegroundColor Yellow
+Write-Host "🛑 [2/6] Limpiando contenedores existentes..." -ForegroundColor Yellow
 $existingContainers = docker ps -a --filter "name=kafka" --filter "name=zookeeper" -q
 if ($existingContainers) {
     Write-Host "   Deteniendo contenedores anteriores..." -ForegroundColor Gray
@@ -38,7 +38,7 @@ if ($existingContainers) {
 # 3. Iniciar Kafka y Zookeeper
 # =============================================================================
 Write-Host ""
-Write-Host "🚀 [3/5] Iniciando Kafka y Zookeeper..." -ForegroundColor Yellow
+Write-Host "🚀 [3/6] Iniciando Kafka y Zookeeper..." -ForegroundColor Yellow
 docker-compose -f docker-compose.kafka.yml up -d
 
 if ($LASTEXITCODE -eq 0) {
@@ -53,7 +53,7 @@ if ($LASTEXITCODE -eq 0) {
 # 4. Esperar a que Kafka esté listo
 # =============================================================================
 Write-Host ""
-Write-Host "⏳ [4/5] Esperando a que Kafka esté listo..." -ForegroundColor Yellow
+Write-Host "⏳ [4/6] Esperando a que Kafka esté listo..." -ForegroundColor Yellow
 Write-Host "   Esto puede tomar 15-30 segundos..." -ForegroundColor Gray
 
 $maxAttempts = 30
@@ -79,10 +79,36 @@ if (-not $kafkaReady) {
 }
 
 # =============================================================================
-# 5. Verificar servicios
+# 5. Crear Topics necesarios
 # =============================================================================
 Write-Host ""
-Write-Host "📊 [5/5] Estado de los servicios:" -ForegroundColor Yellow
+Write-Host "📝 [5/6] Creando topics de Kafka..." -ForegroundColor Yellow
+
+$topics = @(
+    "user-created-events",
+    "password-reset-events"
+)
+
+foreach ($topicName in $topics) {
+    Write-Host "   Creando topic: $topicName..." -ForegroundColor Gray
+    docker exec kafka kafka-topics --create --if-not-exists --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic $topicName 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "   ✅ $topicName" -ForegroundColor Green
+    } else {
+        Write-Host "   ⚠️  $topicName (puede que ya exista)" -ForegroundColor Yellow
+    }
+}
+
+# Listar topics creados
+Write-Host ""
+Write-Host "   Topics disponibles:" -ForegroundColor Cyan
+docker exec kafka kafka-topics --list --bootstrap-server localhost:9092
+
+# =============================================================================
+# 6. Verificar servicios
+# =============================================================================
+Write-Host ""
+Write-Host "📊 [6/6] Estado de los servicios:" -ForegroundColor Yellow
 Write-Host ""
 docker ps --filter "name=kafka" --filter "name=zookeeper" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 

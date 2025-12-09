@@ -10,7 +10,7 @@ $kafkaRunning = docker ps --filter "name=kafka" --format "{{.Names}}" | Select-S
 
 if (-not $kafkaRunning) {
     Write-Host "❌ ERROR: Kafka no está corriendo" -ForegroundColor Red
-    Write-Host "   Ejecuta: .\start-kafka.ps1" -ForegroundColor Yellow
+    Write-Host "   Ejecuta: .\start-all-services.ps1" -ForegroundColor Yellow
     exit 1
 }
 Write-Host "✅ Kafka está corriendo" -ForegroundColor Green
