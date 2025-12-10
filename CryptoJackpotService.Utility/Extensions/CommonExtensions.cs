@@ -396,6 +396,27 @@ public static class CommonExtensions
             : new ObjectResult(payload) { StatusCode = (int)status };
     }
     
+    public static IActionResult ToActionResult<T>(this ResultResponsePaged<T> result)
+    {
+        var status = result.ErrorType?.ToStatusCode() ?? HttpStatusCode.OK;
+
+        var payload = new
+        {
+            success = result.Success,
+            data    = result.Data,
+            pageNumber = result.PageNumber,
+            pageSize = result.PageSize,
+            totalCount = result.TotalCount,
+            totalPages = result.TotalPages,
+            message = result.Message,
+            code    = (int)status
+        };
+
+        return result.Success
+            ? new OkObjectResult(payload)
+            : new ObjectResult(payload) { StatusCode = (int)status };
+    }
+    
     public static HttpStatusCode ToStatusCode(this ErrorType type) => type switch
     {
         ErrorType.Conflict     => HttpStatusCode.Conflict,            // 409

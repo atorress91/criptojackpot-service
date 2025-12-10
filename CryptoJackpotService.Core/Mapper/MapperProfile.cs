@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using CryptoJackpotService.Data.Database.Custom;
 using CryptoJackpotService.Data.Database.Models;
+using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.DTO.Country;
 using CryptoJackpotService.Models.DTO.Prize;
 using CryptoJackpotService.Models.DTO.Role;
 using CryptoJackpotService.Models.DTO.User;
 using CryptoJackpotService.Models.DTO.UserReferral;
+using CryptoJackpotService.Models.Request.Pagination;
 using CryptoJackpotService.Models.Request.Prize;
 using CryptoJackpotService.Models.Request.Referral;
 using CryptoJackpotService.Models.Request.User;
@@ -21,6 +23,8 @@ public class MapperProfile : Profile
 
     private void MapDto()
     {
+        CreateMap<PaginationRequest, Pagination>();
+        
         CreateMap<User, UserDto>();
         CreateMap<CreateUserRequest, User>();
         CreateMap<UserReferralRequest, UserReferral>()

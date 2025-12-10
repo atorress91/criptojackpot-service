@@ -3,11 +3,7 @@ using CryptoJackpotService.Ioc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración nativa de .NET (orden de precedencia de menor a mayor):
-// 1. appsettings.json
-// 2. appsettings.{Environment}.json
-// 3. User Secrets (solo en Development)
-// 4. Variables de entorno (para producción via CI/CD, Docker, etc.)
+// Configuración nativa de .NET
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -15,11 +11,14 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 // User Secrets se agrega automáticamente en Development por WebApplication.CreateBuilder
-
 builder.Services.AddHealthChecks();
 builder.Services.IocAppInjectDependencies(builder.Configuration, builder.Environment);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 
 var app = builder.Build();
 

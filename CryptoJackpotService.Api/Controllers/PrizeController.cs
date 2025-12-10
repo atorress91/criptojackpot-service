@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using CryptoJackpotService.Core.Services.IServices;
+using CryptoJackpotService.Models.Request.Pagination;
 using CryptoJackpotService.Models.Request.Prize;
 using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -19,5 +20,12 @@ public class PrizeController(IPrizeService prizeService) : ControllerBase
         var result = await prizeService.CreatePrizeAsync(request);
         return result.ToActionResult();
     }
-}
 
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetAllPrizesAsync([FromQuery] PaginationRequest pagination)
+    {
+        var result = await prizeService.GetAllPrizesAsync(pagination);
+        return result.ToActionResult();
+    }
+}
