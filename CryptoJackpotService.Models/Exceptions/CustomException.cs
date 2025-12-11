@@ -26,5 +26,5 @@ public class CustomException : BaseException
         ExceptionBody = exceptionBody;
     }
 
-    public string? ExceptionBody { get; set; }
+    public string? ExceptionBody { get; init; }
 }

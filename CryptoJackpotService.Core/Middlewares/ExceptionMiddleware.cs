@@ -4,10 +4,8 @@ using CryptoJackpotService.Core.Helpers;
 using CryptoJackpotService.Models.Exceptions;
 using CryptoJackpotService.Models.Resources;
 using CryptoJackpotService.Models.Responses;
-using CryptoJackpotService.Utility.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -15,34 +13,43 @@ namespace CryptoJackpotService.Core.Middlewares;
 
 public class ExceptionMiddleware(RequestDelegate next)
 {
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(
+        HttpContext context,
+        ILogger<ExceptionMiddleware> logger,
+        IStringLocalizer<ISharedResource> localizer)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
         try
         {
             await next(context);
         }
         catch (Exception ex)
         {
-            await HandleExceptionAsync(context, ex);
+            await HandleExceptionAsync(context, ex, logger, localizer);
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception,
+        ILogger logger,
+        IStringLocalizer<ISharedResource> localizer)
     {
-        var localizer = context.RequestServices.GetRequiredService<IStringLocalizer<ISharedResource>>();
-        var logger = context.RequestServices.GetService<ILogger<ExceptionMiddleware>>();
-
-        context.Response.ContentType = MediaTypeNames.Application.Json;
+        if (context.Response.HasStarted)
+        {
+            logger.LogWarning(
+                "Response already started, cannot handle exception: {Type} - {Message}",
+                exception.GetType().Name,
+                exception.Message);
+            return;
+        }
 
         var (statusCode, message) = ClassifyException(exception, localizer, logger);
 
+        context.Response.ContentType = MediaTypeNames.Application.Json;
         context.Response.StatusCode = statusCode;
 
-        // Header Retry-After para 503
         if (statusCode == (int)HttpStatusCode.ServiceUnavailable)
-            context.Response.Headers.Append("Retry-After", "5");
+            context.Response.Headers.RetryAfter = "5";
 
         var response = new ServicesResponse
         {
@@ -51,7 +58,7 @@ public class ExceptionMiddleware(RequestDelegate next)
             Message = message
         };
 
-        await context.Response.WriteAsync(response.ToJsonString());
+        await context.Response.WriteAsJsonAsync(response);
     }
 
     private static (int StatusCode, string Message) ClassifyException(
