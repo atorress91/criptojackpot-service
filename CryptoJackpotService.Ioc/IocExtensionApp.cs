@@ -166,7 +166,19 @@ public static class IocExtensionApp
                 "Make sure it is defined in your .env or appsettings.json file with the correct path (AppSettings__ConnectionStrings__PostgreSqlConnection).");
         }
 
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        // Configurar el pool de conexiones para manejar alta concurrencia
+        var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
+        {
+            MaxPoolSize = 100, // Máximo de conexiones en el pool
+            MinPoolSize = 5, // Mínimo de conexiones mantenidas
+            ConnectionIdleLifetime = 300, // Tiempo de vida idle en segundos
+            Timeout = 30, // Timeout de conexión en segundos
+            CommandTimeout = 30, // Timeout de comandos en segundos
+            Pooling = true, // Asegurar que pooling está habilitado
+            ConnectionPruningInterval = 10
+        };
+
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionStringBuilder.ConnectionString);
         dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
 

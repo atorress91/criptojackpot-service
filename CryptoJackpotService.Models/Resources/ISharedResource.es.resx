@@ -109,6 +109,9 @@
   <data name="DuplicateRecord" xml:space="preserve">
     <value>Ya existe un registro con esta información</value>
   </data>
+  <data name="ServiceTemporarilyUnavailable" xml:space="preserve">
+    <value>Servicio temporalmente no disponible. Por favor intente más tarde</value>
+  </data>
   <data name="NotFound" xml:space="preserve">
     <value>Recurso no encontrado</value>
   </data>

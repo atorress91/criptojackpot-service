@@ -38,11 +38,12 @@ export default function main() {
 
   const res = http.post(`${BASE_URL}/api/v1/User`, payload, params);
 
-  if (res.status !== 201 && res.status !== 409) {
+  // 201 = Created, 409 = Conflict (duplicado), 503 = Service Unavailable (pool agotado)
+  if (res.status !== 201 && res.status !== 409 && res.status !== 503) {
     console.log(`Status inesperado: ${res.status}, body: ${res.body}`);
   }
 
   check(res, {
-    'status es 201 o 409': r => r.status === 201 || r.status === 409,
+    'status es 201, 409 o 503': r => r.status === 201 || r.status === 409 || r.status === 503,
   });
 }
