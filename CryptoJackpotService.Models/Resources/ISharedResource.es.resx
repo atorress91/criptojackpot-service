@@ -106,6 +106,9 @@
   <data name="Error" xml:space="preserve">
     <value>Ocurrió un error</value>
   </data>
+  <data name="DuplicateRecord" xml:space="preserve">
+    <value>Ya existe un registro con esta información</value>
+  </data>
   <data name="NotFound" xml:space="preserve">
     <value>Recurso no encontrado</value>
   </data>

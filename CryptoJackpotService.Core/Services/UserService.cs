@@ -85,7 +85,7 @@ public class UserService(
         }
         
         var userDto = _mapper.Map<UserDto>(user);
-        return ResultResponse<UserDto>.Ok(userDto);
+        return ResultResponse<UserDto>.Created(userDto);
     }
 
     public async Task<ResultResponse<UserDto>> UpdateImageProfile(UpdateImageProfileRequest request)

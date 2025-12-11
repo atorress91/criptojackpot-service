@@ -381,19 +381,29 @@ public static class CommonExtensions
     
     public static IActionResult ToActionResult<T>(this ResultResponse<T> result)
     {
-        var status = result.ErrorType?.ToStatusCode() ?? HttpStatusCode.OK;
+        if (!result.Success)
+        {
+            var errorStatus = result.ErrorType?.ToStatusCode() ?? HttpStatusCode.InternalServerError;
+            var errorPayload = new
+            {
+                success = result.Success,
+                data    = result.Data,
+                message = result.Message,
+                code    = (int)errorStatus
+            };
+            return new ObjectResult(errorPayload) { StatusCode = (int)errorStatus };
+        }
 
+        var successStatus = result.SuccessType.ToStatusCode();
         var payload = new
         {
             success = result.Success,
             data    = result.Data,
             message = result.Message,
-            code    = (int)status
+            code    = (int)successStatus
         };
 
-        return result.Success
-            ? new OkObjectResult(payload)
-            : new ObjectResult(payload) { StatusCode = (int)status };
+        return new ObjectResult(payload) { StatusCode = (int)successStatus };
     }
     
     public static IActionResult ToActionResult<T>(this ResultResponsePaged<T> result)
@@ -426,6 +436,12 @@ public static class CommonExtensions
         ErrorType.BadRequest   => HttpStatusCode.BadRequest,          // 400
         ErrorType.Forbidden    => HttpStatusCode.Forbidden,           // 403
         _                      => HttpStatusCode.InternalServerError  // 500
+    };
+
+    public static HttpStatusCode ToStatusCode(this SuccessType type) => type switch
+    {
+        SuccessType.Created => HttpStatusCode.Created, // 201
+        _                   => HttpStatusCode.OK       // 200
     };
 
 
