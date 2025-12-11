@@ -39,7 +39,7 @@ export function setup() {
     throw new Error('Login falló, no se puede continuar con la prueba');
   }
 
-  const body = res.json(); // aquí ya sabemos que hay body
+  const body = res.json();
 
   const token = body?.data?.token;
 
