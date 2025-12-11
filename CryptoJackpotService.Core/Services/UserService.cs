@@ -31,10 +31,10 @@ public class UserService(
 
     public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
     {
-        var existingUser = await userRepository.GetUserAsyncByEmail(request.Email);
-        if (existingUser != null)
-            return ResultResponse<UserDto>.Failure(ErrorType.Conflict,
-                localizer[ValidationMessages.EmailAlreadyExists]);
+        // var existingUser = await userRepository.GetUserAsyncByEmail(request.Email);
+        // if (existingUser != null)
+        //     return ResultResponse<UserDto>.Failure(ErrorType.Conflict,
+        //         localizer[ValidationMessages.EmailAlreadyExists]);
 
         User? referrerUser = null;
         if (!string.IsNullOrEmpty(request.ReferralCode))

@@ -1,5 +1,6 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import exec from 'k6/execution';
 
 export const options = {
   vus: 200,
@@ -7,22 +8,24 @@ export const options = {
 };
 
 const BASE_URL = 'http://localhost:5500';
-const TARGET_EMAIL = 'race-test@example.com';
-const TARGET_ID = 'RACE-USER-001';
 
 export default function main() {
+  const uniqueId = `${exec.vu.idInTest}-${exec.scenario.iterationInTest}-${Date.now()}`;
+  const uniqueEmail = `loadtest-${uniqueId}@example.com`;
+  const uniqueIdentification = `ID-${uniqueId}`;
+
   const payload = JSON.stringify({
-    name: 'string',
-    lastName: 'string',
-    email: TARGET_EMAIL, // MISMO email para todos
+    name: 'Load',
+    lastName: 'Tester',
+    email: uniqueEmail, // <--- ÚNICO: Evita bloqueo de fila en BD
     password: 'Test123$',
-    identification: TARGET_ID, // MISMO identification para todos
-    phone: 'string',
+    identification: uniqueIdentification, // <--- ÚNICO: Evita bloqueo por ID
+    phone: '88888888',
     roleId: 2,
     countryId: 54,
-    statePlace: 'string',
-    city: 'string',
-    address: 'string',
+    statePlace: 'San Jose',
+    city: 'San Jose',
+    address: 'Av 10',
     status: true,
     imagePath: 'string',
     googleAccessToken: 'string',
