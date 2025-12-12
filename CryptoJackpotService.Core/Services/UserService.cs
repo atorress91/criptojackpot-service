@@ -27,15 +27,10 @@ public class UserService(
     IEventProducer? eventProducer = null)
     : BaseService(mapper), IUserService
 {
-    private readonly IMapper _mapper = mapper;
+    
 
     public async Task<ResultResponse<UserDto>> CreateUserAsync(CreateUserRequest request)
     {
-        // var existingUser = await userRepository.GetUserAsyncByEmail(request.Email);
-        // if (existingUser != null)
-        //     return ResultResponse<UserDto>.Failure(ErrorType.Conflict,
-        //         localizer[ValidationMessages.EmailAlreadyExists]);
-
         User? referrerUser = null;
         if (!string.IsNullOrEmpty(request.ReferralCode))
         {
@@ -47,7 +42,7 @@ public class UserService(
             }
         }
 
-        var user = _mapper.Map<User>(request);
+        var user = Mapper.Map<User>(request);
         user.SecurityCode = Guid.NewGuid().ToString();
         user.Status = false;
         user.Password = request.Password.EncryptPass();
@@ -84,7 +79,7 @@ public class UserService(
             });
         }
         
-        var userDto = _mapper.Map<UserDto>(user);
+        var userDto = Mapper.Map<UserDto>(user);
         return ResultResponse<UserDto>.Created(userDto);
     }
 
@@ -97,7 +92,7 @@ public class UserService(
 
         user.ImagePath = request.ImageUrl;
         var updatedUser = await userRepository.UpdateUserAsync(user);
-        var userDto = _mapper.Map<UserDto>(updatedUser);
+        var userDto = Mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
             userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
@@ -114,7 +109,7 @@ public class UserService(
 
         user.SecurityCode = Guid.NewGuid().ToString();
         var updatedUser = await userRepository.UpdateUserAsync(user);
-        var userDto = _mapper.Map<UserDto>(updatedUser);
+        var userDto = Mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
             userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
@@ -137,7 +132,7 @@ public class UserService(
             user.Password = request.Password.EncryptPass();
 
         var updatedUser = await userRepository.UpdateUserAsync(user);
-        var userDto = _mapper.Map<UserDto>(updatedUser);
+        var userDto = Mapper.Map<UserDto>(updatedUser);
         
         if (userDto.ImagePath != null)
             userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
@@ -158,7 +153,7 @@ public class UserService(
         
         user.Password = request.NewPassword.EncryptPass();
         var updatedUser = await userRepository.UpdateUserAsync(user);
-        var userDto = _mapper.Map<UserDto>(updatedUser);
+        var userDto = Mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
             userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
@@ -172,7 +167,7 @@ public class UserService(
         if (user is null)
             return ResultResponse<UserDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
-        var userDto = _mapper.Map<UserDto>(user);
+        var userDto = Mapper.Map<UserDto>(user);
         if (userDto.ImagePath != null)
             userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);
         
@@ -185,7 +180,7 @@ public class UserService(
         if(users is null)
             return ResultResponse<IEnumerable<UserDto>>.Failure(ErrorType.NotFound, localizer[ValidationMessages.UserNotExists]);
         
-        var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+        var userDtos = Mapper.Map<IEnumerable<UserDto>>(users);
         var enumerable = userDtos.ToList();
         
         return ResultResponse<IEnumerable<UserDto>>.Ok(enumerable);
@@ -260,7 +255,7 @@ public class UserService(
         user.PasswordResetCodeExpiration = null;
 
         var updatedUser = await userRepository.UpdateUserAsync(user);
-        var userDto = _mapper.Map<UserDto>(updatedUser);
+        var userDto = Mapper.Map<UserDto>(updatedUser);
 
         if (userDto.ImagePath != null)
             userDto.ImagePath = digitalOceanStorageService.GetPresignedUrl(userDto.ImagePath);

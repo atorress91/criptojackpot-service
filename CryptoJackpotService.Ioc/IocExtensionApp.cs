@@ -263,6 +263,7 @@ public static class IocExtensionApp
         services.AddScoped<IUserReferralRepository, UserReferralRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPrizeRepository, PrizeRepository>();
+        services.AddScoped<ILotteryRepository, LotteryRepository>();
     }
 
     private static void InjectServices(IServiceCollection services)
@@ -275,6 +276,7 @@ public static class IocExtensionApp
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IUserReferralService, UserReferralService>();
         services.AddScoped<IPrizeService, PrizeService>();
+        services.AddScoped<ILotteryService, LotteryService>();
 
         services.AddScoped<IEmailProvider, BrevoProvider>();
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();
