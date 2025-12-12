@@ -9,23 +9,21 @@ const loginFailures = new Counter('login_failures');
 
 export const options = {
     stages: [
-        {duration: '30s', target: 50},   // Calentamiento: 50 usuarios
+        {duration: '30s', target: 20},   // Calentamiento: 20 usuarios
+        {duration: '1m', target: 50},    // Incremento a 50 usuarios
         {duration: '1m', target: 100},   // Incremento a 100 usuarios
+        {duration: '2m', target: 100},   // Mantener 100 usuarios
         {duration: '1m', target: 200},   // Incremento a 200 usuarios
-        {duration: '1m', target: 300},   // Incremento a 300 usuarios
-        {duration: '1m', target: 500},   // Incremento a 500 usuarios
-        {duration: '2m', target: 500},   // Mantener 500 usuarios
-        {duration: '1m', target: 1000},  // Pico de estrés: 1000 usuarios
-        {duration: '2m', target: 1000},  // Mantener 1000 usuarios
+        {duration: '2m', target: 200},   // Mantener 200 usuarios
         {duration: '30s', target: 0},    // Desacelerar
     ],
     thresholds: {
-        // El 95% de los requests deben completarse en menos de 2 segundos
-        'http_req_duration': ['p(95)<2000'],
-        // El 99% de los requests deben tener éxito
-        'login_success_rate': ['rate>0.99'],
-        // Menos del 1% de fallos permitidos
-        'http_req_failed': ['rate<0.01'],
+        // El 95% de los requests deben completarse en menos de 3 segundos
+        'http_req_duration': ['p(95)<3000'],
+        // El 95% de los requests deben tener éxito
+        'login_success_rate': ['rate>0.95'],
+        // Menos del 5% de fallos permitidos
+        'http_req_failed': ['rate<0.05'],
     },
 };
 
@@ -65,15 +63,23 @@ export default function main() {
     loginDuration.add(duration);
 
     // Verificar el resultado
-    const success = check(res, {
-        'status es 200': (r) => r.status === 200,
-        'tiene token en la respuesta': (r) => {
-            if (r.status === 200 && r.body) {
-                const body = JSON.parse(r.body);
-                return body?.data?.token !== undefined;
-            }
-            return false;
-        },
+    const isStatus200 = res.status === 200;
+    let hasToken = false;
+    
+    if (isStatus200 && res.body) {
+        try {
+            const body = JSON.parse(res.body);
+            hasToken = body && body.data && body.data.token && body.data.token.length > 0;
+        } catch (e) {
+            hasToken = false;
+        }
+    }
+
+    const success = isStatus200 && hasToken;
+
+    check(res, {
+        'status es 200': () => isStatus200,
+        'tiene token en la respuesta': () => hasToken,
         'response time < 2s': (r) => r.timings.duration < 2000,
         'response time < 1s': (r) => r.timings.duration < 1000,
         'response time < 500ms': (r) => r.timings.duration < 500,

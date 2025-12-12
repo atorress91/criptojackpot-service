@@ -1,0 +1,129 @@
+﻿version: '3.8'
+
+# Docker Compose para pruebas de carga con balanceo de carga (Nginx)
+# Uso: docker-compose -f docker-compose.loadtest.yml up --build --scale api=5
+
+services:
+  # Base de Datos PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: loadtest-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: crypto-jackpot
+    ports:
+      - "5433:5432"
+    volumes:
+      - loadtest-postgres-data:/var/lib/postgresql/data
+    networks:
+      - loadtest-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API - Escalable con múltiples réplicas
+  api:
+    build:
+      context: .
+      dockerfile: CryptoJackpotService.Api/Dockerfile
+    # NO usar container_name cuando se escala (docker-compose no lo permite)
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://+:8080"
+      
+      # Database - Conexión a la DB dentro de Docker
+      AppSettings__ConnectionStrings__PostgreSqlConnection: "Host=db;Port=5432;Database=crypto-jackpot;Username=postgres;Password=postgres123;MaxPoolSize=200;Pooling=true;Minimum Pool Size=10;Connection Idle Lifetime=300"
+      
+      # JWT Settings
+      AppSettings__JwtSettings__SecretKey: "SuperSecretKeyForLoadTesting123456789!@#$%"
+      AppSettings__JwtSettings__Issuer: "criptojackpot.com"
+      AppSettings__JwtSettings__Audience: "criptojackpot.com"
+      AppSettings__JwtSettings__ExpirationInMinutes: "60"
+      
+      # Brevo (mock/disabled para load test)
+      AppSettings__BrevoConfiguration__ApiKey: "mock-api-key"
+      AppSettings__BrevoConfiguration__Email: "test@test.com"
+      AppSettings__BrevoConfiguration__SenderName: "Test"
+      AppSettings__BrevoConfiguration__baseUrl: "http://localhost/"
+      
+      # DigitalOcean (mock para load test)
+      AppSettings__DigitalOceanSettings__AccessKey: "mock"
+      AppSettings__DigitalOceanSettings__SecretKey: "mock"
+      AppSettings__DigitalOceanSettings__Region: "nyc3"
+      AppSettings__DigitalOceanSettings__Endpoint: "https://mock.endpoint.com"
+      AppSettings__DigitalOceanSettings__BucketName: "mock"
+      
+      # Kafka deshabilitado para load test (opcional)
+      Kafka__BootstrapServers: "kafka:29092"
+      Kafka__UserCreatedTopic: "user-created-events"
+      Kafka__PasswordResetTopic: "password-reset-events"
+    expose:
+      - "8080"  # Solo exponer internamente, no al host
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - loadtest-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: loadtest-nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "5500:80"  # K6 golpeará aquí
+    depends_on:
+      - api
+    networks:
+      - loadtest-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Zookeeper para Kafka (opcional para load test)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: loadtest-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - loadtest-network
+
+  # Kafka (opcional para load test)
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: loadtest-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    networks:
+      - loadtest-network
+
+networks:
+  loadtest-network:
+    driver: bridge
+
+volumes:
+  loadtest-postgres-data:
+
