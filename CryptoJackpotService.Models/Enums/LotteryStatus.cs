@@ -1,4 +1,4 @@
-﻿namespace CryptoJackpotService.Data.Database.Enum;
+﻿namespace CryptoJackpotService.Models.Enums;
 
 public enum LotteryStatus
 {
@@ -8,3 +8,4 @@ public enum LotteryStatus
     Completed,
     Cancelled
 }
+

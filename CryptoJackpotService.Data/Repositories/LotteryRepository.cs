@@ -3,12 +3,9 @@ using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 namespace CryptoJackpotService.Data.Repositories;
 
-public class LotteryRepository : BaseRepository, ILotteryRepository
+public class LotteryRepository(
+    CryptoJackpotDbContext context) : BaseRepository(context), ILotteryRepository
 {
-    protected LotteryRepository(CryptoJackpotDbContext context) : base(context)
-    {
-    }
-
     public async Task<Lottery> CreateAsync(Lottery lottery)
     {
         var today = DateTime.Now;

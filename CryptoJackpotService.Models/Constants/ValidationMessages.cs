@@ -26,4 +26,12 @@
         public const string EmailConfirmedSuccessfully = "EmailConfirmedSuccessfully";
         public const string InvalidConfirmationToken = "InvalidConfirmationToken";
         public const string EmailAlreadyConfirmed = "EmailAlreadyConfirmed";
+        public const string InvalidPrice = "InvalidPrice";
+        public const string InvalidMaxTickets = "InvalidMaxTickets";
+        public const string InvalidDateRange = "InvalidDateRange";
+        public const string StartDateMustBeFuture = "StartDateMustBeFuture";
+        public const string InvalidMinNumber = "InvalidMinNumber";
+        public const string InvalidMaxNumber = "InvalidMaxNumber";
+        public const string MaxNumberMustBeGreaterThanMin = "MaxNumberMustBeGreaterThanMin";
+        public const string InvalidTotalSeries = "InvalidTotalSeries";
     }

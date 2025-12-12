@@ -3,10 +3,12 @@ using CryptoJackpotService.Data.Database.Custom;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.DTO.Country;
+using CryptoJackpotService.Models.DTO.Lottery;
 using CryptoJackpotService.Models.DTO.Prize;
 using CryptoJackpotService.Models.DTO.Role;
 using CryptoJackpotService.Models.DTO.User;
 using CryptoJackpotService.Models.DTO.UserReferral;
+using CryptoJackpotService.Models.Request.Lottery;
 using CryptoJackpotService.Models.Request.Pagination;
 using CryptoJackpotService.Models.Request.Prize;
 using CryptoJackpotService.Models.Request.Referral;
@@ -48,5 +50,9 @@ public class MapperProfile : Profile
         CreateMap<PrizeImageRequest, PrizeImage>();
         CreateMap<Prize, PrizeDto>();
         CreateMap<PrizeImage, PrizeImageDto>();
+
+        // Lottery mappings
+        CreateMap<CreateLotteryRequest, Lottery>();
+        CreateMap<Lottery, LotteryDto>();
     }
 }

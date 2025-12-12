@@ -1,18 +1,16 @@
 ﻿using CryptoJackpotService.Models.Enums;
 
-namespace CryptoJackpotService.Data.Database.Models;
+namespace CryptoJackpotService.Models.DTO.Lottery;
 
-public class Lottery : BaseEntity
+public class LotteryDto
 {
     public Guid Id { get; set; }
     public string LotteryNo { get; set; } = null!;
     public string Title { get; set; } = null!;
     public string Description { get; set; } = null!;
-    
-    public int MinNumber { get; set; }         
-    public int MaxNumber { get; set; }          
+    public int MinNumber { get; set; }
+    public int MaxNumber { get; set; }
     public int TotalSeries { get; set; }
-    
     public decimal TicketPrice { get; set; }
     public int MaxTickets { get; set; }
     public int SoldTickets { get; set; }
@@ -23,10 +21,8 @@ public class Lottery : BaseEntity
     public string Terms { get; set; } = null!;
     public bool HasAgeRestriction { get; set; }
     public int? MinimumAge { get; set; }
-    
-    public List<string> RestrictedCountries { get; set; } = null!;
-   
-    public virtual ICollection<Ticket> Tickets { get; set; } = null!;
-    public virtual ICollection<Prize> Prizes { get; set; } = null!;
-    public virtual ICollection<LotteryNumber> LotteryNumbers { get; set; } = null!;
+    public List<string> RestrictedCountries { get; set; } = new();
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
+

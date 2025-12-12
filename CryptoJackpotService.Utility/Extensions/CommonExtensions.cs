@@ -109,20 +109,20 @@ public static class CommonExtensions
 
     public static string ToJsonString(this object source, JsonSerializerOptions jsonSerializerSettings)
         => JsonSerializer.Serialize(source, jsonSerializerSettings);
-    
+
     public static IEnumerable<(T1, T2, T3)> ZipThree<T1, T2, T3>(
         this IEnumerable<T1> source,
         IEnumerable<T2> second,
         IEnumerable<T3> third)
     {
-      
+
         if (source is null) throw new ArgumentNullException(nameof(source));
         if (second is null) throw new ArgumentNullException(nameof(second));
         if (third is null) throw new ArgumentNullException(nameof(third));
-        
+
         return ZipThreeImpl(source, second, third);
     }
-    
+
     private static IEnumerable<(T1, T2, T3)> ZipThreeImpl<T1, T2, T3>(
         IEnumerable<T1> source,
         IEnumerable<T2> second,
@@ -347,6 +347,13 @@ public static class CommonExtensions
         return currentDate.AddDays(daysUntilMonday);
     }
 
+    public static string GenerateLotteryNumber()
+    {
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        var random = new Random().Next(1000, 9999);
+        return $"LOT-{timestamp}-{random}";
+    }
+
     public static uint Crc32(string input)
     {
         var table = new uint[256];
@@ -378,7 +385,7 @@ public static class CommonExtensions
 
         return ~crc;
     }
-    
+
     public static IActionResult ToActionResult<T>(this ResultResponse<T> result)
     {
         if (!result.Success)
@@ -387,25 +394,31 @@ public static class CommonExtensions
             var errorPayload = new
             {
                 success = result.Success,
-                data    = result.Data,
+                data = result.Data,
                 message = result.Message,
-                code    = (int)errorStatus
+                code = (int)errorStatus
             };
-            return new ObjectResult(errorPayload) { StatusCode = (int)errorStatus };
+            return new ObjectResult(errorPayload)
+            {
+                StatusCode = (int)errorStatus
+            };
         }
 
         var successStatus = result.SuccessType.ToStatusCode();
         var payload = new
         {
             success = result.Success,
-            data    = result.Data,
+            data = result.Data,
             message = result.Message,
-            code    = (int)successStatus
+            code = (int)successStatus
         };
 
-        return new ObjectResult(payload) { StatusCode = (int)successStatus };
+        return new ObjectResult(payload)
+        {
+            StatusCode = (int)successStatus
+        };
     }
-    
+
     public static IActionResult ToActionResult<T>(this ResultResponsePaged<T> result)
     {
         var status = result.ErrorType?.ToStatusCode() ?? HttpStatusCode.OK;
@@ -413,35 +426,38 @@ public static class CommonExtensions
         var payload = new
         {
             success = result.Success,
-            data    = result.Data,
+            data = result.Data,
             pageNumber = result.PageNumber,
             pageSize = result.PageSize,
             totalCount = result.TotalCount,
             totalPages = result.TotalPages,
             message = result.Message,
-            code    = (int)status
+            code = (int)status
         };
 
         return result.Success
             ? new OkObjectResult(payload)
-            : new ObjectResult(payload) { StatusCode = (int)status };
+            : new ObjectResult(payload)
+            {
+                StatusCode = (int)status
+            };
     }
-    
+
     public static HttpStatusCode ToStatusCode(this ErrorType type) => type switch
     {
-        ErrorType.Conflict     => HttpStatusCode.Conflict,            // 409
-        ErrorType.Validation   => HttpStatusCode.UnprocessableEntity, // 422
-        ErrorType.NotFound     => HttpStatusCode.NotFound,            // 404
-        ErrorType.Unauthorized => HttpStatusCode.Unauthorized,        // 401
-        ErrorType.BadRequest   => HttpStatusCode.BadRequest,          // 400
-        ErrorType.Forbidden    => HttpStatusCode.Forbidden,           // 403
-        _                      => HttpStatusCode.InternalServerError  // 500
+        ErrorType.Conflict => HttpStatusCode.Conflict, // 409
+        ErrorType.Validation => HttpStatusCode.UnprocessableEntity, // 422
+        ErrorType.NotFound => HttpStatusCode.NotFound, // 404
+        ErrorType.Unauthorized => HttpStatusCode.Unauthorized, // 401
+        ErrorType.BadRequest => HttpStatusCode.BadRequest, // 400
+        ErrorType.Forbidden => HttpStatusCode.Forbidden, // 403
+        _ => HttpStatusCode.InternalServerError // 500
     };
 
     public static HttpStatusCode ToStatusCode(this SuccessType type) => type switch
     {
         SuccessType.Created => HttpStatusCode.Created, // 201
-        _                   => HttpStatusCode.OK       // 200
+        _ => HttpStatusCode.OK // 200
     };
 
 
