@@ -40,8 +40,5 @@ public class CreateLotteryRequestValidator : LocalizedValidator<CreateLotteryReq
         RuleFor(x => x.EndDate)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
             .GreaterThan(x => x.StartDate).WithMessage(Localizer[ValidationMessages.InvalidDateRange]);
-
-        RuleFor(x => x.Status)
-            .IsInEnum().WithMessage(Localizer[ValidationMessages.InvalidRequest]);
     }
 }
