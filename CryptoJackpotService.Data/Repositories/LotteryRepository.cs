@@ -1,6 +1,10 @@
 ﻿using CryptoJackpotService.Data.Database;
+using CryptoJackpotService.Data.Database.Custom;
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
+using CryptoJackpotService.Models.Configuration;
+using Microsoft.EntityFrameworkCore;
+
 namespace CryptoJackpotService.Data.Repositories;
 
 public class LotteryRepository(
@@ -17,5 +21,25 @@ public class LotteryRepository(
         await Context.SaveChangesAsync();
 
         return lottery;
+    }
+
+    public async Task<PagedList<Lottery>> GetAllLotteriesAsync(Pagination pagination)
+    {
+        var totalItems = await Context.Lotteries.CountAsync();
+
+        var lotteries = await Context.Lotteries
+            .Include(l => l.Prizes)
+            .OrderByDescending(l => l.CreatedAt)
+            .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .ToListAsync();
+
+        return new PagedList<Lottery>
+        {
+            Items = lotteries,
+            TotalItems = totalItems,
+            PageNumber = pagination.PageNumber,
+            PageSize = pagination.PageSize
+        };
     }
 }

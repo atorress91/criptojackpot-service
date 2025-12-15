@@ -1,4 +1,5 @@
-﻿using CryptoJackpotService.Models.Enums;
+﻿using CryptoJackpotService.Models.DTO.Prize;
+using CryptoJackpotService.Models.Enums;
 
 namespace CryptoJackpotService.Models.DTO.Lottery;
 
@@ -22,6 +23,7 @@ public class LotteryDto
     public bool HasAgeRestriction { get; set; }
     public int? MinimumAge { get; set; }
     public List<string> RestrictedCountries { get; set; } = new();
+    public List<PrizeDto> Prizes { get; set; } = new();
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
