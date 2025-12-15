@@ -28,4 +28,12 @@ public class PrizeController(IPrizeService prizeService) : ControllerBase
         var result = await prizeService.GetAllPrizesAsync(pagination);
         return result.ToActionResult();
     }
+
+    [Authorize]
+    [HttpPut]
+    public async Task<IActionResult> UpdatePrizeAsync([FromBody] UpdatePrizeRequest request)
+    {
+        var result = await prizeService.UpdatePrizeAsync(request);
+        return result.ToActionResult();
+    }
 }

@@ -34,4 +34,5 @@
         public const string InvalidMaxNumber = "InvalidMaxNumber";
         public const string MaxNumberMustBeGreaterThanMin = "MaxNumberMustBeGreaterThanMin";
         public const string InvalidTotalSeries = "InvalidTotalSeries";
+        public const string PrizeNotFound = "PrizeNotFound";
     }

@@ -21,7 +21,7 @@ public class PrizeRepository(CryptoJackpotDbContext context) : BaseRepository(co
         return prize;
     }
 
-    public async Task<Prize?> GetPrizeAsync(long id)
+    public async Task<Prize?> GetPrizeAsync(Guid id)
         => await Context.Prizes.FindAsync(id);
 
     public async Task<PagedList<Prize>> GetAllPrizesAsync(Pagination pagination)
@@ -41,5 +41,13 @@ public class PrizeRepository(CryptoJackpotDbContext context) : BaseRepository(co
             PageNumber = pagination.PageNumber,
             PageSize = pagination.PageSize
         };
+    }
+    
+    public async Task<Prize> UpdatePrizeAsync(Prize prize)
+    {
+        prize.UpdatedAt = DateTime.UtcNow;
+        Context.Prizes.Update(prize);
+        await Context.SaveChangesAsync();
+        return prize;
     }
 }

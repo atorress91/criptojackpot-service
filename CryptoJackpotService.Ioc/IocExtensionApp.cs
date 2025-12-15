@@ -16,6 +16,7 @@ using CryptoJackpotService.Data.Repositories.IRepositories;
 using CryptoJackpotService.Models.Configuration;
 using CryptoJackpotService.Models.Request.Auth;
 using CryptoJackpotService.Models.Request.Lottery;
+using CryptoJackpotService.Models.Request.Prize;
 using CryptoJackpotService.Models.Request.User;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -302,6 +303,7 @@ public static class IocExtensionApp
         services.AddTransient<IValidator<RequestPasswordResetRequest>, RequestPasswordResetRequestValidator>();
         services.AddTransient<IValidator<ResetPasswordWithCodeRequest>, ResetPasswordWithCodeRequestValidator>();
         services.AddTransient<IValidator<CreateLotteryRequest>, CreateLotteryRequestValidator>();
+        services.AddTransient<IValidator<UpdatePrizeRequest>, UpdatePrizeRequestValidator>();
     }
 
     private static void InjectPackages(IServiceCollection services)

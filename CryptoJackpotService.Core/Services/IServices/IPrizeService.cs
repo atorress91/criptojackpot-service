@@ -9,4 +9,5 @@ public interface IPrizeService
 {
     Task<ResultResponse<PrizeDto>> CreatePrizeAsync(CreatePrizeRequest request);
     Task<ResultResponsePaged<PrizeDto>> GetAllPrizesAsync(PaginationRequest pagination);
+    Task<ResultResponse<PrizeDto>> UpdatePrizeAsync(UpdatePrizeRequest request);
 }

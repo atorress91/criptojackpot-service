@@ -7,7 +7,7 @@ namespace CryptoJackpotService.Data.Repositories.IRepositories;
 public interface IPrizeRepository
 {
     Task<Prize> CreatePrizeAsync(Prize prize);
-    Task<Prize?> GetPrizeAsync(long id);
+    Task<Prize?> GetPrizeAsync(Guid id);
     Task<PagedList<Prize>> GetAllPrizesAsync(Pagination pagination);
+    Task<Prize> UpdatePrizeAsync(Prize prize);
 }
-
