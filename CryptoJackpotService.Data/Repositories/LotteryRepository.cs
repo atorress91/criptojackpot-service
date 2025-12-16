@@ -42,4 +42,24 @@ public class LotteryRepository(
             PageSize = pagination.PageSize
         };
     }
+
+    public async Task<Lottery> UpdateAsync(Lottery lottery)
+    {
+        lottery.UpdatedAt = DateTime.UtcNow;
+        Context.Lotteries.Update(lottery);
+        await Context.SaveChangesAsync();
+        return lottery;
+    }
+
+    public async Task<Lottery?> GetLotteryAsync(Guid id)
+        => await Context.Lotteries.FindAsync(id);
+
+    public async Task<Lottery> DeleteLotteryAsync(Lottery lottery)
+    {
+        lottery.UpdatedAt = DateTime.UtcNow;
+        lottery.DeletedAt = DateTime.UtcNow;
+        Context.Lotteries.Update(lottery);
+        await Context.SaveChangesAsync();
+        return lottery;
+    }
 }

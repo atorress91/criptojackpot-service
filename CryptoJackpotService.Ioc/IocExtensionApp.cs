@@ -304,6 +304,7 @@ public static class IocExtensionApp
         services.AddTransient<IValidator<ResetPasswordWithCodeRequest>, ResetPasswordWithCodeRequestValidator>();
         services.AddTransient<IValidator<CreateLotteryRequest>, CreateLotteryRequestValidator>();
         services.AddTransient<IValidator<UpdatePrizeRequest>, UpdatePrizeRequestValidator>();
+        services.AddTransient<IValidator<UpdateLotteryRequest>, UpdateLotteryRequestValidator>();
     }
 
     private static void InjectPackages(IServiceCollection services)

@@ -28,5 +28,29 @@ public class LotteryController(ILotteryService lotteryService) : ControllerBase
         var result = await lotteryService.GetAllLotteriesAsync(pagination);
         return result.ToActionResult();
     }
+
+    [Authorize]
+    [HttpGet("{lotteryId:guid}")]
+    public async Task<IActionResult> GetLotteryByIdAsync([FromRoute] Guid lotteryId)
+    {
+        var result = await lotteryService.GetLotteryByIdAsync(lotteryId);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
+    [HttpPut("{lotteryId:guid}")]
+    public async Task<IActionResult> UpdateLotteryAsync([FromRoute] Guid lotteryId, [FromBody] UpdateLotteryRequest request)
+    {
+        var result = await lotteryService.UpdateLotteryAsync(lotteryId, request);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
+    [HttpDelete("{lotteryId:guid}")]
+    public async Task<IActionResult> DeleteLotteryAsync([FromRoute] Guid lotteryId)
+    {
+        var result = await lotteryService.DeleteLotteryAsync(lotteryId);
+        return result.ToActionResult();
+    }
 }
 

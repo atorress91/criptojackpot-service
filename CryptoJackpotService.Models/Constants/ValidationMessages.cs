@@ -35,4 +35,5 @@
         public const string MaxNumberMustBeGreaterThanMin = "MaxNumberMustBeGreaterThanMin";
         public const string InvalidTotalSeries = "InvalidTotalSeries";
         public const string PrizeNotFound = "PrizeNotFound";
+        public const string LotteryNotFound = "LotteryNotFound";
     }
