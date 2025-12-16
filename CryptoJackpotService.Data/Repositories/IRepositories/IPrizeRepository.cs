@@ -10,4 +10,5 @@ public interface IPrizeRepository
     Task<Prize?> GetPrizeAsync(Guid id);
     Task<PagedList<Prize>> GetAllPrizesAsync(Pagination pagination);
     Task<Prize> UpdatePrizeAsync(Prize prize);
+    Task<Prize> DeletePrizeAsync(Prize prize);
 }

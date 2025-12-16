@@ -20,6 +20,17 @@ public class PrizeService(
     IStringLocalizer<ISharedResource> localizer)
     : BaseService(mapper), IPrizeService
 {
+    public async Task<ResultResponse<PrizeDto>> GetPrizeAsyncById(Guid prizeId)
+    {
+        var prize = await prizeRepository.GetPrizeAsync(prizeId);
+
+        if (prize is null)
+            return ResultResponse<PrizeDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.PrizeNotFound]);
+
+        var prizeDto = Mapper.Map<PrizeDto>(prize);
+
+        return ResultResponse<PrizeDto>.Ok(prizeDto);
+    }
     public async Task<ResultResponse<PrizeDto>> CreatePrizeAsync(CreatePrizeRequest request)
     {
         var prize = Mapper.Map<Prize>(request);
@@ -49,7 +60,7 @@ public class PrizeService(
     public async Task<ResultResponse<PrizeDto>> UpdatePrizeAsync(UpdatePrizeRequest request)
     {
         var prize = await prizeRepository.GetPrizeAsync(request.Id);
-        
+
         if (prize is null)
             return ResultResponse<PrizeDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.PrizeNotFound]);
 
@@ -62,11 +73,27 @@ public class PrizeService(
         prize.IsDeliverable = request.IsDeliverable;
         prize.IsDigital = request.IsDigital;
         prize.AdditionalImages = request.AdditionalImageUrls
-            .Select(url => new PrizeImage { ImageUrl = url })
+            .Select(url => new PrizeImage
+            {
+                ImageUrl = url
+            })
             .ToList();
 
         prize = await prizeRepository.UpdatePrizeAsync(prize);
 
+        var prizeDto = Mapper.Map<PrizeDto>(prize);
+
+        return ResultResponse<PrizeDto>.Ok(prizeDto);
+    }
+
+    public async Task<ResultResponse<PrizeDto>> DeletePrizeAsync(Guid prizeId)
+    {
+        var prize = await prizeRepository.GetPrizeAsync(prizeId);
+
+        if (prize is null)
+            return ResultResponse<PrizeDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.PrizeNotFound]);
+
+        prize = await prizeRepository.DeletePrizeAsync(prize);
         var prizeDto = Mapper.Map<PrizeDto>(prize);
 
         return ResultResponse<PrizeDto>.Ok(prizeDto);

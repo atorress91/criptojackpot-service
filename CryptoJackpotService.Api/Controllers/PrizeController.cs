@@ -30,10 +30,26 @@ public class PrizeController(IPrizeService prizeService) : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("{prizeId:guid}")]
+    public async Task<IActionResult> GetPrizeByIdAsync([FromRoute] Guid prizeId)
+    {
+        var result = await prizeService.GetPrizeAsyncById(prizeId);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdatePrizeAsync([FromBody] UpdatePrizeRequest request)
     {
         var result = await prizeService.UpdatePrizeAsync(request);
+        return result.ToActionResult();
+    }
+
+    [Authorize]
+    [HttpDelete("{prizeId:guid}")]
+    public async Task<IActionResult> DeletePrizeAsync([FromRoute] Guid prizeId)
+    {
+        var result = await prizeService.DeletePrizeAsync(prizeId);
         return result.ToActionResult();
     }
 }
