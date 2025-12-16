@@ -18,7 +18,8 @@ namespace CryptoJackpotService.Core.Services;
 public class LotteryService(
     IMapper mapper,
     IStringLocalizer<ISharedResource> localizer,
-    ILotteryRepository lotteryRepository)
+    ILotteryRepository lotteryRepository,
+    IPrizeRepository prizeRepository)
     : BaseService(mapper), ILotteryService
 {
     public async Task<ResultResponse<LotteryDto>> CreateLotteryAsync(CreateLotteryRequest request)
@@ -29,6 +30,11 @@ public class LotteryService(
         lottery.SoldTickets = 0;
 
         lottery = await lotteryRepository.CreateAsync(lottery);
+
+        if (request.PrizeId.HasValue)
+        {
+            await prizeRepository.LinkPrizeToLotteryAsync(request.PrizeId.Value, lottery.Id);
+        }
 
         var lotteryDto = Mapper.Map<LotteryDto>(lottery);
         return ResultResponse<LotteryDto>.Created(lotteryDto);
@@ -85,6 +91,14 @@ public class LotteryService(
         lottery.RestrictedCountries = request.RestrictedCountries;
 
         lottery = await lotteryRepository.UpdateAsync(lottery);
+
+        // Desvincular premio actual y vincular el nuevo si se proporciona
+        await prizeRepository.UnlinkPrizesFromLotteryAsync(lotteryId);
+        
+        if (request.PrizeId.HasValue)
+        {
+            await prizeRepository.LinkPrizeToLotteryAsync(request.PrizeId.Value, lotteryId);
+        }
 
         var lotteryDto = Mapper.Map<LotteryDto>(lottery);
 

@@ -11,4 +11,6 @@ public interface IPrizeRepository
     Task<PagedList<Prize>> GetAllPrizesAsync(Pagination pagination);
     Task<Prize> UpdatePrizeAsync(Prize prize);
     Task<Prize> DeletePrizeAsync(Prize prize);
+    Task LinkPrizeToLotteryAsync(Guid prizeId, Guid lotteryId);
+    Task UnlinkPrizesFromLotteryAsync(Guid lotteryId);
 }

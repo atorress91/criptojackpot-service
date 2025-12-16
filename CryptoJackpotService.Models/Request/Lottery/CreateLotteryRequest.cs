@@ -17,4 +17,5 @@ public class CreateLotteryRequest
     public bool HasAgeRestriction { get; set; }
     public int? MinimumAge { get; set; }
     public List<string> RestrictedCountries { get; set; } = new();
+    public Guid? PrizeId { get; set; }
 }

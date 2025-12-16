@@ -60,4 +60,30 @@ public class PrizeRepository(CryptoJackpotDbContext context) : BaseRepository(co
         await Context.SaveChangesAsync();
         return prize;
     }
+
+    public async Task LinkPrizeToLotteryAsync(Guid prizeId, Guid lotteryId)
+    {
+        var prize = await Context.Prizes.FindAsync(prizeId);
+        if (prize is not null)
+        {
+            prize.LotteryId = lotteryId;
+            prize.UpdatedAt = DateTime.UtcNow;
+            await Context.SaveChangesAsync();
+        }
+    }
+
+    public async Task UnlinkPrizesFromLotteryAsync(Guid lotteryId)
+    {
+        var prizes = await Context.Prizes
+            .Where(p => p.LotteryId == lotteryId)
+            .ToListAsync();
+
+        foreach (var prize in prizes)
+        {
+            prize.LotteryId = null;
+            prize.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await Context.SaveChangesAsync();
+    }
 }
