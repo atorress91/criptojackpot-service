@@ -23,12 +23,13 @@ public class PrizeRepository(CryptoJackpotDbContext context) : BaseRepository(co
 
     public async Task<Prize?> GetPrizeAsync(Guid id)
         => await Context.Prizes.FindAsync(id);
-
     public async Task<PagedList<Prize>> GetAllPrizesAsync(Pagination pagination)
     {
-        var totalItems = await Context.Prizes.CountAsync();
+        var query = Context.Prizes.Where(p => p.LotteryId == null);
+        
+        var totalItems = await query.CountAsync();
 
-        var prizes = await Context.Prizes
+        var prizes = await query
             .OrderByDescending(p => p.CreatedAt)
             .Skip((pagination.PageNumber - 1) * pagination.PageSize)
             .Take(pagination.PageSize)
