@@ -20,8 +20,7 @@ public class LotteryController(ILotteryService lotteryService) : ControllerBase
         var result = await lotteryService.CreateLotteryAsync(request);
         return result.ToActionResult();
     }
-
-    [Authorize]
+    
     [HttpGet]
     public async Task<IActionResult> GetAllLotteriesAsync([FromQuery] PaginationRequest pagination)
     {
