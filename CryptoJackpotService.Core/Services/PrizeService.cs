@@ -57,9 +57,9 @@ public class PrizeService(
             prizes.TotalPages);
     }
 
-    public async Task<ResultResponse<PrizeDto>> UpdatePrizeAsync(UpdatePrizeRequest request)
+    public async Task<ResultResponse<PrizeDto>> UpdatePrizeAsync(Guid prizeId, UpdatePrizeRequest request)
     {
-        var prize = await prizeRepository.GetPrizeAsync(request.Id);
+        var prize = await prizeRepository.GetPrizeAsync(prizeId);
 
         if (prize is null)
             return ResultResponse<PrizeDto>.Failure(ErrorType.NotFound, localizer[ValidationMessages.PrizeNotFound]);

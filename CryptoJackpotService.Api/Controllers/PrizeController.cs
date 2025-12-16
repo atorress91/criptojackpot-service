@@ -38,10 +38,10 @@ public class PrizeController(IPrizeService prizeService) : ControllerBase
     }
 
     [Authorize]
-    [HttpPut]
-    public async Task<IActionResult> UpdatePrizeAsync([FromBody] UpdatePrizeRequest request)
+    [HttpPut("{prizeId:guid}")]
+    public async Task<IActionResult> UpdatePrizeAsync([FromRoute] Guid prizeId, [FromBody] UpdatePrizeRequest request)
     {
-        var result = await prizeService.UpdatePrizeAsync(request);
+        var result = await prizeService.UpdatePrizeAsync(prizeId, request);
         return result.ToActionResult();
     }
 

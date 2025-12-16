@@ -10,6 +10,6 @@ public interface IPrizeService
     Task<ResultResponse<PrizeDto>> GetPrizeAsyncById(Guid prizeId);
     Task<ResultResponse<PrizeDto>> CreatePrizeAsync(CreatePrizeRequest request);
     Task<ResultResponsePaged<PrizeDto>> GetAllPrizesAsync(PaginationRequest pagination);
-    Task<ResultResponse<PrizeDto>> UpdatePrizeAsync(UpdatePrizeRequest request);
+    Task<ResultResponse<PrizeDto>> UpdatePrizeAsync(Guid prizeId, UpdatePrizeRequest request);
     Task<ResultResponse<PrizeDto>> DeletePrizeAsync(Guid prizeId);
 }

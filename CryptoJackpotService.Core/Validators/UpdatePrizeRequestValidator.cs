@@ -10,8 +10,6 @@ public class UpdatePrizeRequestValidator : LocalizedValidator<UpdatePrizeRequest
 {
     public UpdatePrizeRequestValidator(IStringLocalizer<ISharedResource> localizer) : base(localizer)
     {
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage(Localizer[ValidationMessages.Required]);
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage(Localizer[ValidationMessages.Required])
