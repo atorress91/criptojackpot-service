@@ -266,6 +266,7 @@ public static class IocExtensionApp
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPrizeRepository, PrizeRepository>();
         services.AddScoped<ILotteryRepository, LotteryRepository>();
+        services.AddScoped<ILotteryNumberRepository, LotteryNumberRepository>();
     }
 
     private static void InjectServices(IServiceCollection services)

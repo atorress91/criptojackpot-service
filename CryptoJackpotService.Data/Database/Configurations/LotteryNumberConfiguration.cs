@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CryptoJackpotService.Data.Database.Configurations;
 
-public class LotteryNumberConfiguration:IEntityTypeConfiguration<LotteryNumber>
+public class LotteryNumberConfiguration : IEntityTypeConfiguration<LotteryNumber>
 {
     public void Configure(EntityTypeBuilder<LotteryNumber> builder)
     {
@@ -22,6 +22,9 @@ public class LotteryNumberConfiguration:IEntityTypeConfiguration<LotteryNumber>
             .HasForeignKey(e => e.TicketId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        builder.HasIndex(e => new { e.LotteryId, e.Number, e.Series })
+            .HasDatabaseName("IX_LotteryNumbers_LotteryId_Number_Series");
+        
         builder.HasQueryFilter(e => !e.DeletedAt.HasValue);
     }
 }
