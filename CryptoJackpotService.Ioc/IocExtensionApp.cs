@@ -280,6 +280,7 @@ public static class IocExtensionApp
         services.AddScoped<IUserReferralService, UserReferralService>();
         services.AddScoped<IPrizeService, PrizeService>();
         services.AddScoped<ILotteryService, LotteryService>();
+        services.AddScoped<ILotteryNumberService, LotteryNumberService>();
 
         services.AddScoped<IEmailProvider, BrevoProvider>();
         services.AddScoped<IEmailTemplateProvider, EmailTemplateProvider>();

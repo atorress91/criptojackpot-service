@@ -400,11 +400,11 @@ namespace CryptoJackpotService.Data.Migrations
                     b.HasKey("Id")
                         .HasName("pk_lottery_numbers");
 
-                    b.HasIndex("LotteryId")
-                        .HasDatabaseName("ix_lottery_numbers_lottery_id");
-
                     b.HasIndex("TicketId")
                         .HasDatabaseName("ix_lottery_numbers_ticket_id");
+
+                    b.HasIndex("LotteryId", "Number", "Series")
+                        .HasDatabaseName("IX_LotteryNumbers_LotteryId_Number_Series");
 
                     b.ToTable("lottery_numbers", (string)null);
                 });

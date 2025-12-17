@@ -2,6 +2,7 @@
 using CryptoJackpotService.Data.Database.Models;
 using CryptoJackpotService.Data.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
+
 namespace CryptoJackpotService.Data.Repositories;
 
 public class LotteryNumberRepository(CryptoJackpotDbContext context) : BaseRepository(context), ILotteryNumberRepository
@@ -29,7 +30,7 @@ public class LotteryNumberRepository(CryptoJackpotDbContext context) : BaseRepos
     /// <summary>
     /// Obtiene N números aleatorios disponibles directamente desde la DB
     /// </summary>
-    public async Task<List<int>> GetRandomAvailableNumbersAsync(Guid lotteryId, int count, int maxNumber)
+    public async Task<List<int>> GetRandomAvailableNumbersAsync(Guid lotteryId, int count, int maxNumber, int minNumber = 1)
     {
         var soldNumbers = await Context.LotteryNumbers
             .Where(x => x.LotteryId == lotteryId)
@@ -39,12 +40,38 @@ public class LotteryNumberRepository(CryptoJackpotDbContext context) : BaseRepos
         var soldSet = soldNumbers.ToHashSet();
         
         // Generar números disponibles en memoria (más rápido que consultar todos)
-        var availableNumbers = Enumerable.Range(1, maxNumber)
+        var availableNumbers = Enumerable.Range(minNumber, maxNumber)
             .Where(n => !soldSet.Contains(n))
             .OrderBy(_ => Guid.NewGuid()) // Aleatorio
             .Take(count)
             .ToList();
 
         return availableNumbers;
+    }
+
+    /// <summary>
+    /// Agrega múltiples números de lotería
+    /// </summary>
+    public async Task AddRangeAsync(IEnumerable<LotteryNumber> lotteryNumbers)
+    {
+        await Context.LotteryNumbers.AddRangeAsync(lotteryNumbers);
+        await Context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Libera los números asociados a un ticket (elimina los registros)
+    /// </summary>
+    public async Task<bool> ReleaseNumbersByTicketAsync(Guid ticketId)
+    {
+        var numbers = await Context.LotteryNumbers
+            .Where(x => x.TicketId == ticketId)
+            .ToListAsync();
+
+        if (!numbers.Any())
+            return false;
+
+        Context.LotteryNumbers.RemoveRange(numbers);
+        await Context.SaveChangesAsync();
+        return true;
     }
 }
