@@ -27,8 +27,7 @@ public class LotteryController(ILotteryService lotteryService) : ControllerBase
         var result = await lotteryService.GetAllLotteriesAsync(pagination);
         return result.ToActionResult();
     }
-
-    [Authorize]
+    
     [HttpGet("{lotteryId:guid}")]
     public async Task<IActionResult> GetLotteryByIdAsync([FromRoute] Guid lotteryId)
     {

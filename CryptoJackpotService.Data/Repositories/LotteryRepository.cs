@@ -52,7 +52,9 @@ public class LotteryRepository(
     }
 
     public async Task<Lottery?> GetLotteryAsync(Guid id)
-        => await Context.Lotteries.FindAsync(id);
+        => await Context.Lotteries
+            .Include(l => l.Prizes)
+            .FirstOrDefaultAsync(l => l.Id == id);
 
     public async Task<Lottery> DeleteLotteryAsync(Lottery lottery)
     {
